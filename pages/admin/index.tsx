@@ -83,7 +83,7 @@ export default function AdminPage() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div style={{ height: '90vh' }} className="min-h-screen flex items-center justify-center bg-gray-100">
           <p className="text-red-600 font-medium">Access Denied. Please login.</p>
         </div>
        </>
@@ -93,7 +93,7 @@ export default function AdminPage() {
   return (
     <>
         <Navbar />
-        <div className="min-h-screen p-6 bg-gray-100">
+        <div style={{ height: '90vh' }} className="min-h-screen p-6 bg-gray-100">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Admin Upload Panel</h1>
             <button

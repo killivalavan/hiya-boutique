@@ -6,15 +6,15 @@ const collections = [
   'Salwar suits Unstitched',
   'Kurtis / Kurti Sets',
   'Bottom Wears',
-  'Accessories',
+  'Dupatta',
   'Maxi & Frocks',
+  'Accessories',
   'Home Decors',
-  'Dupatta'
 ];
 
 export default function Collections() {
   return (
-    <section id="collections" className="py-10 px-4">
+    <section id="collections" className="my-10 px-4">
       <h2 className="text-2xl font-bold text-center mb-8">New Collection</h2>
       
       <div  style={{ maxWidth: '70rem' }} className="mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">

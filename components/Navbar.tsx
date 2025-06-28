@@ -3,32 +3,46 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FiMenu, FiX } from 'react-icons/fi';
+import { useRouter } from 'next/router';
 
 export default function Navbar() {
+  const router = useRouter();
+  const isHomePage = router.pathname === '/';
+  const isMediaGallery = router.pathname.includes('/gallery/')
+  const isAdminPage = router.pathname.includes('/admin')
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className="bg-black text-white px-6 py-4 flex justify-between items-center h-[66px]">
       {/* Logo + Brand */}
-      <div className="flex items-center">
-        <Image src="/logo.png" alt="Logo" width={50} height={50} />
-        <span className="ml-4 text-lg sm:text-xl font-semibold whitespace-nowrap hidden sm:inline">
-          Hiya Fashion's & Boutique
-        </span>
-      </div>
+       <Link href="/">
+        <div className="flex items-center">
+          <Image src="/logo.png" alt="Logo" width={100} height={100} />
+        </div>
+      </Link>
 
       {/* Desktop Links */}
-      <div className="hidden sm:flex space-x-6 text-sm sm:text-base">
-        <Link href="/">
+      <div className="hidden sm:flex space-x-6 text-sm sm:text-base items-center">
+       {!isHomePage && ( <Link href="/">
           <span className="hover:text-[#8ac63e] cursor-pointer">Home</span>
         </Link>
-        <Link href="#collections">
-          <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
-        </Link>
-        <Link href="#about">
-          <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
-        </Link>
-      </div>
+      )}
+        {!isMediaGallery && !isAdminPage &&
+          <>
+            <Link href="#our-services">
+              <span className="hover:text-[#8ac63e] cursor-pointer">Our Services</span>
+            </Link>
+          
+            <Link href="#collections">
+              <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
+            </Link>
+          </>
+        }
+        {!isAdminPage && <Link href="#about">
+            <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
+          </Link>  
+        }
+        </div>
 
       {/* Hamburger Icon */}
       <div className="sm:hidden">
@@ -48,7 +62,7 @@ export default function Navbar() {
           <Link href="#collections" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
           </Link>
-          <Link href="#about" onClick={() => setMenuOpen(false)}>
+          <Link href="/about" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
           </Link>
         </div>

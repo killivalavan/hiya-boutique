@@ -13,14 +13,14 @@ export default function ImageCarousel() {
       >
         <div>
           <img
-            src="/carousel/c1.webp"
+            src="/carousel/c1.png"
             alt="img1"
             className="w-full h-full object-cover"
           />
         </div>
         <div>
           <img
-            src="/carousel/c2.jpg"
+            src="/carousel/c2.png"
             alt="img2"
             className="w-full h-full object-cover"
           />

@@ -27,7 +27,7 @@ const services = [
     image: '/services/makeup.png'
   },
   {
-    name: 'Training',
+    name: 'Aari Embroidery Classes',
     slug: 'training',
     image: '/services/training.png'
   }
@@ -35,7 +35,7 @@ const services = [
 
 export default function Services() {
   return (
-  <section id="our-services" className="py-10 px-4">
+  <section id="our-services" className="my-10 px-4">
   <div className="mx-auto"  style={{ maxWidth: '60rem' }}>
     <h2 className="text-2xl font-bold text-center mb-8">Our Services</h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 place-items-center">

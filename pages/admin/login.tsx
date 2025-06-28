@@ -28,7 +28,7 @@ export default function AdminLogin() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+      <div style={{ height: '90vh' }} className="flex items-center justify-center bg-gray-100 p-6">
         <form
           onSubmit={handleLogin}
           className="bg-white p-6 rounded shadow-md max-w-sm w-full"
