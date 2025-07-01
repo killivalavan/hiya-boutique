@@ -36,6 +36,10 @@ export default function Navbar() {
             <Link href="#collections">
               <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
             </Link>
+
+            <Link href="#customer-diaries">
+              <span className="hover:text-[#8ac63e] cursor-pointer">Customer Diaries</span>
+            </Link>
           </>
         }
         {!isAdminPage && <Link href="#about">
@@ -62,7 +66,10 @@ export default function Navbar() {
           <Link href="#collections" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
           </Link>
-          <Link href="/about" onClick={() => setMenuOpen(false)}>
+           <Link href="#customer-diaries" onClick={() => setMenuOpen(false)}>
+            <span className="hover:text-[#8ac63e] cursor-pointer">Customer Diaries</span>
+          </Link>
+          <Link href="#about" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
           </Link>
         </div>

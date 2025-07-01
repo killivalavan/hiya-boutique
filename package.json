@@ -9,6 +9,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "formidable": "^3.5.4",
+    "framer-motion": "^12.19.2",
     "imagekitio-react": "^4.3.0",
     "jsonwebtoken": "^9.0.0",
     "next": "latest",

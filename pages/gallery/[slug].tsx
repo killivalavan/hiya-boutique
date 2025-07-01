@@ -16,7 +16,7 @@ const categoryTitles: Record<string, string> = {
   'dupatta': 'Dupatta',
   'aari-embroidery-designing-customisation': 'Aari Embroidery Designing - Customisation',
   'customization-custom-tailoring': 'Customization - Custom Tailoring',
-  'pre-pleating': 'Pre Pleating',
+  'pre-pleating': 'Pre-Pleating',
   'mehendi-art': 'Mehendi Art',
   'bridal-makeup-hair-style': 'Bridal Makeup & Hair Style',
   'training': 'Training',

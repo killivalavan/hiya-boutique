@@ -12,7 +12,7 @@ const services = [
     image: '/services/tailoring.png'
   },
   {
-    name: 'Pre Pleating',
+    name: 'Pre-Pleating',
     slug: 'pre-pleating',
     image: '/services/pleating.png'
   },

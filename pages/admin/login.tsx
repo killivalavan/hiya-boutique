@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../../components/Navbar'
+import Navbar from '../../components/Navbar';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -8,20 +8,33 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Prevent redirect if already authenticated
     const auth = localStorage.getItem('admin-auth');
     if (auth === 'true') {
       router.replace('/admin');
     }
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') {
-      localStorage.setItem('admin-auth', 'true');
-      router.replace('/admin');
-    } else {
-      setError('Invalid password');
+    setError('');
+
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (res.ok) {
+        localStorage.setItem('admin-auth', 'true');
+        router.replace('/admin');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Login failed');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError('Something went wrong');
     }
   };
 
@@ -57,6 +70,6 @@ export default function AdminLogin() {
           </button>
         </form>
       </div>
-     </>
+    </>
   );
 }

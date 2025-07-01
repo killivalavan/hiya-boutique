@@ -5,6 +5,7 @@ import Services from '../components/Services'
 import Collections from '../components/Collections'
 import Banner from '../components/Banner'
 import {WhatsAppButton} from '../components/WhatsAppButton';
+import CustomerDiaries from '../components/CustomerDiaries'
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <Services />
         <Banner />
         <Collections />
+        <CustomerDiaries />
       </main>
       <Footer />
       <WhatsAppButton />

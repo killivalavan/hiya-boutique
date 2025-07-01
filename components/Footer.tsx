@@ -76,7 +76,7 @@ export default function Footer() {
             Follow us
           </h4>
           <div className="flex gap-4 mt-2 text-white text-lg">
-            <a href="https://www.instagram.com/ilakkiya2017" aria-label="Instagram">
+            <a href="https://www.instagram.com/hiya_instore/" aria-label="Instagram">
               <FaInstagram />
             </a>
             <a href="https://www.facebook.com/ilakkiya2017" aria-label="Facebook">
@@ -103,10 +103,10 @@ export default function Footer() {
             Contact Us
           </h4>
           <p className="flex items-center gap-2 text-white">
-            <FaPhoneAlt className="text-white" /> +91-7299927172
+            <FaPhoneAlt className="text-white" /> +91 72999 27172
           </p>
           <p className="flex items-center gap-2 text-white">
-            <FaPhoneAlt className="text-white" /> +91-91**********
+            <FaPhoneAlt className="text-white" /> +91 86102 03368
           </p>
         </div>
       </div>
