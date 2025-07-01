@@ -30,20 +30,20 @@ export default function Navbar() {
         {!isMediaGallery && !isAdminPage &&
           <>
             <Link href="#our-services">
-              <span className="hover:text-[#8ac63e] cursor-pointer">Our Services</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Services</span>
             </Link>
           
             <Link href="#collections">
-              <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collections</span>
             </Link>
 
             <Link href="#customer-diaries">
-              <span className="hover:text-[#8ac63e] cursor-pointer">Customer Diaries</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Customer Diaries</span>
             </Link>
           </>
         }
         {!isAdminPage && <Link href="#about">
-            <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">About</span>
           </Link>  
         }
         </div>
@@ -61,16 +61,19 @@ export default function Navbar() {
       {menuOpen && (
         <div className="absolute top-[66px] left-0 w-full bg-black text-white flex flex-col items-start px-6 py-4 space-y-4 sm:hidden z-50 shadow-lg">
           <Link href="/" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer">Home</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Home</span>
+          </Link>
+           <Link href="#collections" onClick={() => setMenuOpen(false)}>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Services</span>
           </Link>
           <Link href="#collections" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer">All Collection</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collectiona</span>
           </Link>
            <Link href="#customer-diaries" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer">Customer Diaries</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Customer Diaries</span>
           </Link>
           <Link href="#about" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">About</span>
           </Link>
         </div>
       )}

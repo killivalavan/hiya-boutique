@@ -15,7 +15,6 @@ export function WhatsAppButton({
   large = false,
 }: WhatsAppButtonProps) {
   const encodedMessage = encodeURIComponent(message);
-console.log("WhatsApp number:", phoneNumber);
   return (
     <Link
       href={`https://wa.me/${phoneNumber}?text=${encodedMessage}`}

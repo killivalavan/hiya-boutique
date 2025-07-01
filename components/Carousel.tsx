@@ -5,7 +5,7 @@ export default function ImageCarousel() {
   return (
     <div className="w-full overflow-hidden custom-carousel">
       <Carousel
-        autoPlay={false}
+        autoPlay
         infiniteLoop
         showThumbs={false}
         showStatus={false}
@@ -45,7 +45,20 @@ export default function ImageCarousel() {
             className="w-full h-full object-cover"
           />
           {/* Text above the image */}
-          <div className="w-[90%] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center font-bold text-xl sm:text-2xl md:text-3xl">
+          <div className="w-[90%] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center font-bold text-xl sm:text-2xl md:text-5xl">
+            Where Style Tells a Story. Every Stitch Matters.
+          </div>
+        </div>
+
+          {/* Carousel Item 4 */}
+        <div className="relative w-full h-[300px] sm:h-[400px] md:h-[700px]">
+          <img
+            src="/carousel/c4.png"
+            alt="img3"
+            className="w-full h-full object-cover"
+          />
+          {/* Text above the image */}
+          <div className="w-[90%] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center font-bold text-xl sm:text-2xl md:text-5xl">
             Where Style Tells a Story. Every Stitch Matters.
           </div>
         </div>
