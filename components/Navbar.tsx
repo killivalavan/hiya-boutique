@@ -30,20 +30,20 @@ export default function Navbar() {
         {!isMediaGallery && !isAdminPage &&
           <>
             <Link href="#our-services">
-              <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Services</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer">Services</span>
             </Link>
           
             <Link href="#collections">
-              <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collections</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer">Collections</span>
             </Link>
 
             <Link href="#customer-diaries">
-              <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Customer Diaries</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer">Customer Diaries</span>
             </Link>
           </>
         }
         {!isAdminPage && <Link href="#about">
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">About</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
           </Link>  
         }
         </div>
@@ -51,9 +51,9 @@ export default function Navbar() {
       {/* Hamburger Icon */}
       <div className="sm:hidden">
         {menuOpen ? (
-          <FiX size={24} onClick={() => setMenuOpen(false)} className="cursor-pointer" />
+          <FiX size={30} onClick={() => setMenuOpen(false)} className="cursor-pointer" />
         ) : (
-          <FiMenu size={24} onClick={() => setMenuOpen(true)} className="cursor-pointer" />
+          <FiMenu size={30} onClick={() => setMenuOpen(true)} className="cursor-pointer" />
         )}
       </div>
 
