@@ -15,9 +15,15 @@ export default function Navbar() {
   return (
     <nav className="bg-black text-white px-6 py-4 flex justify-between items-center h-[66px]">
       {/* Logo + Brand */}
-       <Link href="/">
-        <div className="flex items-center">
-          <Image src="/logo.png" alt="Logo" width={100} height={100} />
+      <Link href="/">
+        <div className="relative w-[100px] h-[100px] hover:scale-105 transition-transform duration-300">
+          <Image 
+            src="/logo.png" 
+            alt="Logo" 
+            fill 
+            className="object-contain"
+            priority
+          />
         </div>
       </Link>
 
@@ -67,7 +73,7 @@ export default function Navbar() {
             <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Services</span>
           </Link>
           <Link href="#collections" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collectiona</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collections</span>
           </Link>
            <Link href="#customer-diaries" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Customer Diaries</span>

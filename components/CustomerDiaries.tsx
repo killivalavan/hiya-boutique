@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { FaStar, FaRegStar, FaStarHalfAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { RiGalleryLine } from 'react-icons/ri';
+import { FcPicture } from 'react-icons/fc';
 import { motion } from "framer-motion";
+import Link from 'next/link';
 
 export default function CustomerDiaries() {
   const diaries = [
@@ -123,17 +126,24 @@ export default function CustomerDiaries() {
             ))}
           </motion.div>
         </div>
+        <div className="flex flex-col sm:flex-row justify-center items-center mt-10 gap-4 w-full">
+            <a
+                href="https://www.google.com/search?sca_esv=292556bc86c4e054&sxsrf=AE3TifN8uCf_v4rU4MAvRvULQhqZB0kDtQ:1752406306738&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E0MmBCc3wY133-DJIe5aB2wivCtZ6ArxoSxKYurdVHOf9aCqPUE6vAISjisQQf1CQydbhZ4ZhhYjw7xKoS0vriwYPCXxOz5S0kLSR9FLdxGeOWfNdw%3D%3D&q=Hiya+Fashion%27s+%26+Boutique+Reviews&sa=X&ved=2ahUKEwit9qib3rmOAxVd1jgGHQ87KD8Q0bkNegQIIRAE&biw=1536&bih=695&dpr=1.25#lrd=0x3a525fece8f2d717:0x5a4c9dacae579f79,1,,,,"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition"
+            >
+                <FcGoogle className="text-xl" />
+                <span>See All Google Reviews</span>
+            </a>
 
-        <div className="flex justify-center mt-10">
-          <a
-            href="https://www.google.com/search?sca_esv=292556bc86c4e054&sxsrf=AE3TifMaWnP4spbcoR1zQEta4Uu34pv2hw:1751282914757&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E0MmBCc3wY133-DJIe5aB2wivCtZ6ArxoSxKYurdVHOf9aCqPUE6vAISjisQQf1CQydbhZ4ZhhYjw7xKoS0vriwYPCXxOz5S0kLSR9FLdxGeOWfNdw%3D%3D&q=Hiya+Fashion%27s+%26+Boutique+Reviews"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition"
-          >
-            <FcGoogle className="text-xl" />
-            <span>See All Google Reviews</span>
-          </a>
+            <Link
+                href="/gallery/clients-gallery"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#2563eb] text-white px-6 py-3 rounded-full hover:bg-[#1e4bb8] transition"
+            >
+                <FcPicture className="text-xl" />
+                <span className="">Clients Gallery</span>
+            </Link>
         </div>
       </div>
     </div>

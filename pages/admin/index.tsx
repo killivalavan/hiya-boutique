@@ -20,7 +20,7 @@ const collections = [
   'accessories',
   'maxi-frocks',
   'home-decors',
-  'dupatta'
+  'artificial-jewellery'
 ];
 
 export default function AdminPage() {
@@ -29,6 +29,7 @@ export default function AdminPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [existingFiles, setExistingFiles] = useState<string[]>([]);
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     const auth = localStorage.getItem('admin-auth');
@@ -50,14 +51,19 @@ export default function AdminPage() {
     }
   }, [selectedCategory]);
 
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleUpload = async () => {
     if (!selectedCategory || !files) {
-      alert('Please select category and images');
+      showToast('Please select category and images', 'error');
       return;
     }
 
     if (files.length > 5) {
-      alert('You can upload a maximum of 5 images at a time');
+      showToast('You can upload a maximum of 5 images at a time', 'error');
       return;
     }
 
@@ -73,19 +79,18 @@ export default function AdminPage() {
 
       const data = await res.json();
       if (res.ok) {
-        alert('Upload successful!');
+        showToast('Upload successful!', 'success');
         setFiles(null);
         (document.getElementById('images') as HTMLInputElement).value = '';
-        // refresh
         fetch(`/api/list?category=${selectedCategory}`)
           .then(res => res.json())
           .then(data => setExistingFiles(data.files || []));
       } else {
-        alert('Upload failed: ' + (data?.error || 'Unknown error'));
+        showToast('Upload failed: ' + (data?.error || 'Unknown error'), 'error');
       }
     } catch (err: any) {
       console.error('Upload error:', err);
-      alert('Upload failed: ' + err.message);
+      showToast('Upload failed: ' + err.message, 'error');
     }
   };
 
@@ -102,15 +107,14 @@ export default function AdminPage() {
 
       const data = await res.json();
       if (res.ok) {
-        alert('Deleted successfully');
-        // refresh
+        showToast('Deleted successfully', 'success');
         setExistingFiles(existingFiles.filter(f => f !== filename));
       } else {
-        alert('Delete failed: ' + (data?.error || 'Unknown error'));
+        showToast('Delete failed: ' + (data?.error || 'Unknown error'), 'error');
       }
     } catch (err: any) {
       console.error('Delete error:', err);
-      alert('Delete failed: ' + err.message);
+      showToast('Delete failed: ' + err.message, 'error');
     }
   };
 
@@ -168,6 +172,9 @@ export default function AdminPage() {
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </optgroup>
+            <optgroup label="Client Gallery">
+              <option value="clients-gallery">Clients Gallery</option>
+            </optgroup>
           </select>
 
           <label htmlFor="images" className="block mb-2 font-semibold">
@@ -191,9 +198,11 @@ export default function AdminPage() {
             Upload
           </button>
 
-          {selectedCategory && existingFiles.length > 0 && (
+          {selectedCategory && (
             <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-2">Existing Images</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                {existingFiles.length} images in this category
+              </h3>
               <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                 {existingFiles.map((file) => (
                   <div key={file} className="relative w-32 h-32 border rounded overflow-hidden">
@@ -211,6 +220,13 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {toast && (
+        <div className={`fixed top-5 right-5 px-6 py-3 rounded shadow-lg z-50 transition-all duration-300
+          ${toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+          {toast.message}
+        </div>
+      )}
     </>
   );
 }

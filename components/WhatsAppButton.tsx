@@ -22,10 +22,10 @@ export function WhatsAppButton({
       rel="noopener noreferrer"
     >
       {large ? (
-        <button className="flex bg-green-600 text-white px-6 py-3 rounded-lg mx-auto mt-4 hover:bg-green-700 transition">
-          <FaWhatsapp className="inline-block mr-2 text-2xl" />
-          {text || "Chat on WhatsApp"}
-        </button>
+       <button className="flex bg-green-600 text-white px-2 md:px-6 py-3 rounded-lg mx-auto mt-4 hover:bg-green-700 transition">
+        <FaWhatsapp className="inline-block mr-2 text-2xl" />
+        {text || "Chat on WhatsApp"}
+      </button>
       ) : (
         <div className="fixed bottom-4 left-4 bg-green-500 text-white p-3 rounded-full shadow-lg z-50 hover:bg-green-600 transition-all">
           <FaWhatsapp size={24} />

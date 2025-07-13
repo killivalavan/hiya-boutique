@@ -6,8 +6,8 @@ const collections = [
   'Salwar suits Unstitched',
   'Kurtis / Kurti Sets',
   'Bottom Wears',
-  'Dupatta',
   'Maxi & Frocks',
+  'Artificial Jewellery',
   'Accessories',
   'Home Decors',
 ];

@@ -16,13 +16,18 @@ export default function GalleryPage({
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
-  const [skeletonLoading, setSkeletonLoading] = useState(true);
   const imagesPerPage = 12;
 
-  // Load images from localStorage or initial prop on mount
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const [recentlyAdded, setRecentlyAdded] = useState<Set<string>>(new Set());
+
+  const handleImageLoad = (img: string) => {
+    setLoadedImages((prev) => ({ ...prev, [img]: true }));
+  };
+
   useEffect(() => {
     const storageKey = `gallery_${imageFolder}`;
-    let loaded = false;
+    let loadedImagesFromCache = false;
 
     try {
       const stored = localStorage.getItem(storageKey);
@@ -30,26 +35,25 @@ export default function GalleryPage({
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           setGalleryImages(parsed);
-          loaded = true;
+          loadedImagesFromCache = true;
+
+          const newFiles = images.filter(f => !parsed.includes(f));
+          if (newFiles.length > 0) {
+            setRecentlyAdded(new Set(newFiles));
+            setTimeout(() => setRecentlyAdded(new Set()), 3000);
+          }
         }
       }
     } catch (e) {
-      console.error("Error parsing local storage:", e);
+      console.error("LocalStorage parse error:", e);
     }
 
-    if (!loaded) {
+    if (!loadedImagesFromCache) {
       setGalleryImages(images);
       localStorage.setItem(storageKey, JSON.stringify(images));
     }
   }, [imageFolder, images]);
 
-  // Handle skeleton loading timeout
-  useEffect(() => {
-    const timer = setTimeout(() => setSkeletonLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle body scroll locking on modal
   useEffect(() => {
     document.body.style.overflow = selectedImage ? 'hidden' : 'auto';
     return () => { document.body.style.overflow = 'auto'; };
@@ -68,20 +72,24 @@ export default function GalleryPage({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {galleryImages.slice(0, page * imagesPerPage).map((img) => (
-            <div key={img} className="relative cursor-pointer group">
-              {skeletonLoading ? (
-                <div className="w-full h-[300px] bg-gray-300 animate-pulse rounded-lg" />
-              ) : (
-                <Image
-                  src={`/${imageFolder}/${img}`}
-                  alt={img}
-                  width={400}
-                  height={300}
-                  className="w-full h-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300"
-                  loading="lazy"
-                  onClick={() => setSelectedImage(img)}
-                />
+            <div
+              key={img}
+              className={`relative cursor-pointer group w-full 
+                ${recentlyAdded.has(img) ? 'ring-4 ring-green-400 animate-pulse' : ''}`}
+            >
+              {!loadedImages[img] && (
+                <div className="w-full aspect-w-4 aspect-h-3 bg-gray-300 animate-pulse rounded-lg absolute inset-0 z-10" />
               )}
+              <Image
+                src={`/${imageFolder}/${img}`}
+                alt={img}
+                width={400}
+                height={300}
+                className={`w-full h-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 ${loadedImages[img] ? '' : 'invisible'}`}
+                loading="lazy"
+                onLoadingComplete={() => handleImageLoad(img)}
+                onClick={() => setSelectedImage(img)}
+              />
             </div>
           ))}
         </div>
@@ -96,7 +104,6 @@ export default function GalleryPage({
           </button>
         </div>
 
-        {/* Modal with framer motion */}
         <AnimatePresence>
           {selectedImage && (
             <motion.div
@@ -104,6 +111,7 @@ export default function GalleryPage({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setSelectedImage(null)}
             >
               <motion.div
@@ -111,6 +119,7 @@ export default function GalleryPage({
                 initial={{ scale: 0.7, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.7, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
