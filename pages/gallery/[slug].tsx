@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { GetServerSideProps } from 'next';
 import GalleryPage from '../../components/GalleryPage';
 import Navbar from '../../components/Navbar';
@@ -23,12 +21,17 @@ const categoryTitles: Record<string, string> = {
   'clients-gallery': 'Clients Gallery',
 };
 
+type CloudinaryFile = {
+  url: string;
+  public_id: string;
+};
+
 export default function DynamicGalleryPage({
   slug,
   images,
 }: {
   slug: string;
-  images: string[];
+  images: CloudinaryFile[];
 }) {
   const title =
     categoryTitles[slug] ||
@@ -39,7 +42,6 @@ export default function DynamicGalleryPage({
       <Navbar />
       <GalleryPage
         title={title}
-        imageFolder={slug}
         images={images}
       />
     </>
@@ -48,26 +50,14 @@ export default function DynamicGalleryPage({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slug = context.params?.slug as string;
-  const folderPath = path.join(process.cwd(), 'public', slug);
 
-  let images: string[] = [];
-  try {
-    images = fs
-      .readdirSync(folderPath)
-      .filter((file) => /\.(jpe?g|png|webp)$/i.test(file))
-      .sort((a, b) => {
-        const aTime = fs.statSync(path.join(folderPath, a)).mtime.getTime();
-        const bTime = fs.statSync(path.join(folderPath, b)).mtime.getTime();
-        return bTime - aTime; // newest first
-      });
-  } catch (err) {
-    console.error(`Error reading folder /public/${slug}`, err);
-  }
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/list?category=${slug}`);
+  const data = await res.json();
 
   return {
     props: {
       slug,
-      images,
+      images: data.files || [],
     },
   };
 };

@@ -4,16 +4,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Footer from './Footer';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 
+type CloudinaryFile = {
+  url: string;
+  public_id: string;
+};
+
 export default function GalleryPage({
   title,
-  imageFolder,
   images,
 }: {
   title: string;
-  imageFolder: string;
-  images: string[];
+  images: CloudinaryFile[];
 }) {
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryImages, setGalleryImages] = useState<CloudinaryFile[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const imagesPerPage = 12;
@@ -21,12 +24,12 @@ export default function GalleryPage({
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   const [recentlyAdded, setRecentlyAdded] = useState<Set<string>>(new Set());
 
-  const handleImageLoad = (img: string) => {
-    setLoadedImages((prev) => ({ ...prev, [img]: true }));
+  const handleImageLoad = (url: string) => {
+    setLoadedImages((prev) => ({ ...prev, [url]: true }));
   };
 
   useEffect(() => {
-    const storageKey = `gallery_${imageFolder}`;
+    const storageKey = `gallery_${title}`;
     let loadedImagesFromCache = false;
 
     try {
@@ -37,9 +40,9 @@ export default function GalleryPage({
           setGalleryImages(parsed);
           loadedImagesFromCache = true;
 
-          const newFiles = images.filter(f => !parsed.includes(f));
+          const newFiles = images.filter(f => !parsed.some((p: any) => p.url === f.url));
           if (newFiles.length > 0) {
-            setRecentlyAdded(new Set(newFiles));
+            setRecentlyAdded(new Set(newFiles.map(f => f.url)));
             setTimeout(() => setRecentlyAdded(new Set()), 3000);
           }
         }
@@ -52,7 +55,7 @@ export default function GalleryPage({
       setGalleryImages(images);
       localStorage.setItem(storageKey, JSON.stringify(images));
     }
-  }, [imageFolder, images]);
+  }, [title, images]);
 
   useEffect(() => {
     document.body.style.overflow = selectedImage ? 'hidden' : 'auto';
@@ -73,22 +76,21 @@ export default function GalleryPage({
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {galleryImages.slice(0, page * imagesPerPage).map((img) => (
             <div
-              key={img}
+              key={img.public_id}
               className={`relative cursor-pointer group w-full 
-                ${recentlyAdded.has(img) ? 'ring-4 ring-green-400 animate-pulse' : ''}`}
+                ${recentlyAdded.has(img.url) ? 'ring-4 ring-green-400 animate-pulse' : ''}`}
             >
-              {!loadedImages[img] && (
+              {!loadedImages[img.url] && (
                 <div className="w-full aspect-w-4 aspect-h-3 bg-gray-300 animate-pulse rounded-lg absolute inset-0 z-10" />
               )}
               <Image
-                src={`/${imageFolder}/${img}`}
-                alt={img}
-                width={400}
-                height={300}
-                className={`w-full h-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 ${loadedImages[img] ? '' : 'invisible'}`}
+                src={img.url}
+                alt=""
+                width={400} height={300}
+                className={`w-full h-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 ${loadedImages[img.url] ? '' : 'invisible'}`}
                 loading="lazy"
-                onLoadingComplete={() => handleImageLoad(img)}
-                onClick={() => setSelectedImage(img)}
+                onLoadingComplete={() => handleImageLoad(img.url)}
+                onClick={() => setSelectedImage(img.url)}
               />
             </div>
           ))}
@@ -131,10 +133,9 @@ export default function GalleryPage({
 
                 <div className="flex justify-center mb-4">
                   <Image
-                    src={`/${imageFolder}/${selectedImage}`}
-                    alt={selectedImage}
-                    width={1200}
-                    height={800}
+                    src={selectedImage}
+                    alt=""
+                    width={1200} height={800}
                     className="w-full h-auto max-h-[75vh] object-contain"
                   />
                 </div>

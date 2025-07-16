@@ -23,12 +23,17 @@ const collections = [
   'artificial-jewellery'
 ];
 
+type CloudinaryFile = {
+  url: string;
+  public_id: string;
+};
+
 export default function AdminPage() {
   const router = useRouter();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
-  const [existingFiles, setExistingFiles] = useState<string[]>([]);
+  const [existingFiles, setExistingFiles] = useState<CloudinaryFile[]>([]);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -94,21 +99,21 @@ export default function AdminPage() {
     }
   };
 
-  const handleDelete = async (filename: string) => {
+  const handleDelete = async (file: CloudinaryFile) => {
     if (!selectedCategory) return;
-    if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
+    if (!confirm(`Are you sure you want to delete this image?`)) return;
 
     try {
       const res = await fetch('/api/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: selectedCategory, filename })
+        body: JSON.stringify({ public_id: file.public_id })
       });
 
       const data = await res.json();
       if (res.ok) {
         showToast('Deleted successfully', 'success');
-        setExistingFiles(existingFiles.filter(f => f !== filename));
+        setExistingFiles(existingFiles.filter(f => f.public_id !== file.public_id));
       } else {
         showToast('Delete failed: ' + (data?.error || 'Unknown error'), 'error');
       }
@@ -205,8 +210,8 @@ export default function AdminPage() {
               </h3>
               <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                 {existingFiles.map((file) => (
-                  <div key={file} className="relative w-32 h-32 border rounded overflow-hidden">
-                    <img src={`/${selectedCategory}/${file}`} alt="" className="w-full h-full object-cover" />
+                  <div key={file.public_id} className="relative w-32 h-32 border rounded overflow-hidden">
+                    <img src={file.url} alt="" className="w-full h-full object-cover" />
                     <button
                       onClick={() => handleDelete(file)}
                       className="pb-1 absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
