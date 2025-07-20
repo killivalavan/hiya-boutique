@@ -112,7 +112,7 @@ export default function SmallImageCarousel() {
               <div
                 key={idx}
                 className="relative bg-gray-100 rounded-lg overflow-hidden shadow-md 
-                           w-full sm:w-[90%] md:w-[45%] lg:w-[30%] h-[250px]"
+                           w-full sm:w-[90%] md:w-[45%] lg:w-[30%] h-[400px]"
               >
                 <img
                   src={url}

@@ -8,6 +8,7 @@ import {WhatsAppButton} from '../components/WhatsAppButton'
 import CustomerDiaries from '../components/CustomerDiaries'
 import SmallImageCarousel from '../components/SmallImageCarousel'
 import WhatsAppTestimonials from '../components/WhatsAppTestimonials';
+import CustomerBanner from '../components/CustomerBanner'
 
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
         <Banner />
         <Collections />
         <CustomerDiaries />
+        <CustomerBanner />
         <WhatsAppTestimonials />
         <SmallImageCarousel /> 
       </main>
