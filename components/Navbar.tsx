@@ -10,6 +10,7 @@ export default function Navbar() {
   const isHomePage = router.pathname === '/';
   const isMediaGallery = router.pathname.includes('/gallery/')
   const isAdminPage = router.pathname.includes('/admin')
+  const isAboutPage = router.pathname === '/about';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -33,7 +34,7 @@ export default function Navbar() {
           <span className="hover:text-[#8ac63e] cursor-pointer">Home</span>
         </Link>
       )}
-        {!isMediaGallery && !isAdminPage &&
+        {!isMediaGallery && !isAdminPage && !isAboutPage &&
           <>
             <Link href="#our-services">
               <span className="hover:text-[#8ac63e] cursor-pointer">Services</span>
@@ -48,7 +49,7 @@ export default function Navbar() {
             </Link>
           </>
         }
-        {!isAdminPage && <Link href="#about">
+        {!isAdminPage && !isAboutPage && <Link href="/about">
             <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
           </Link>  
         }
@@ -78,7 +79,7 @@ export default function Navbar() {
            <Link href="#customer-diaries" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Testimonials</span>
           </Link>
-          <Link href="#about" onClick={() => setMenuOpen(false)}>
+          <Link href="/about" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer uppercase">About</span>
           </Link>
         </div>
