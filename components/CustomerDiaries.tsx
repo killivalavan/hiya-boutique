@@ -68,7 +68,7 @@ export default function CustomerDiaries() {
     <div id="customer-diaries" className="w-full px-4 py-10 bg-[#f9f9f9]">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Customer Diaries</h2>
+          <h2 className="lg:w-[50%] lg:ml-auto text-2xl font-bold">Our Happy Clients</h2>
           <div className="flex gap-4 mr-0 sm:mr-3">
             <button
               onClick={slidePrev}
@@ -136,14 +136,6 @@ export default function CustomerDiaries() {
                 <FcGoogle className="text-xl" />
                 <span>See All Google Reviews</span>
             </a>
-
-            <Link
-                href="/gallery/clients-gallery"
-                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#2563eb] text-white px-6 py-3 rounded-full hover:bg-[#1e4bb8] transition"
-            >
-                <FcPicture className="text-xl" />
-                <span className="">Clients Gallery</span>
-            </Link>
         </div>
       </div>
     </div>

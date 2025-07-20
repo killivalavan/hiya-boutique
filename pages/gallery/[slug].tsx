@@ -19,6 +19,7 @@ const categoryTitles: Record<string, string> = {
   'bridal-makeup-hair-style': 'Bridal Makeup & Hair Style',
   'training': 'Training',
   'clients-gallery': 'Clients Gallery',
+  'whatsapp-testimonials': 'Words From WhatsApp'
 };
 
 type CloudinaryFile = {
@@ -43,6 +44,7 @@ export default function DynamicGalleryPage({
       <GalleryPage
         title={title}
         images={images}
+        slug={slug}
       />
     </>
   );

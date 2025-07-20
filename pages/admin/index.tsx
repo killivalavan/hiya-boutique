@@ -179,6 +179,7 @@ export default function AdminPage() {
             </optgroup>
             <optgroup label="Client Gallery">
               <option value="clients-gallery">Clients Gallery</option>
+              <option value="whatsapp-testimonials">Whatsapp Screenshots</option>
             </optgroup>
           </select>
 

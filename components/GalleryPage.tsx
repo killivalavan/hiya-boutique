@@ -12,9 +12,11 @@ type CloudinaryFile = {
 export default function GalleryPage({
   title,
   images,
+  slug
 }: {
   title: string;
   images: CloudinaryFile[];
+  slug: string
 }) {
   const [galleryImages, setGalleryImages] = useState<CloudinaryFile[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -87,7 +89,10 @@ export default function GalleryPage({
                 src={img.url}
                 alt=""
                 width={400} height={300}
-                className={`w-full h-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 ${loadedImages[img.url] ? '' : 'invisible'}`}
+                className={`w-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 
+                  ${loadedImages[img.url] ? '' : 'invisible'} 
+                  ${slug === 'whatsapp-testimonials' ? 'h-48' : 'h-full'}`
+                }
                 loading="lazy"
                 onLoadingComplete={() => handleImageLoad(img.url)}
                 onClick={() => setSelectedImage(img.url)}
@@ -140,11 +145,22 @@ export default function GalleryPage({
                   />
                 </div>
 
+                {!(slug === 'whatsapp-testimonials' || slug === 'clients-gallery') && (
                 <WhatsAppButton
                   message={`Hi, I'm interested in the ${title} collection - ${selectedImage}`}
                   large
-                  text="Get The Latest Collections"
+                  text={
+                    slug === 'aari-embroidery-designing-customisation' ||
+                    slug === 'customization-custom-tailoring' ||
+                    slug === 'pre-pleating' ||
+                    slug === 'mehendi-art' ||
+                    slug === 'bridal-makeup-hair-style' ||
+                    slug === 'training'
+                      ? 'Book now!'
+                      : 'Get The Latest Collections'
+                  }
                 />
+              )}
               </motion.div>
             </motion.div>
           )}

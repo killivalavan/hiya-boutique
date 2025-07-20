@@ -4,8 +4,11 @@ import Footer from '../components/Footer'
 import Services from '../components/Services'
 import Collections from '../components/Collections'
 import Banner from '../components/Banner'
-import {WhatsAppButton} from '../components/WhatsAppButton';
+import {WhatsAppButton} from '../components/WhatsAppButton'
 import CustomerDiaries from '../components/CustomerDiaries'
+import SmallImageCarousel from '../components/SmallImageCarousel'
+import WhatsAppTestimonials from '../components/WhatsAppTestimonials';
+
 
 export default function Home() {
   return (
@@ -17,6 +20,8 @@ export default function Home() {
         <Banner />
         <Collections />
         <CustomerDiaries />
+        <WhatsAppTestimonials />
+        <SmallImageCarousel /> 
       </main>
       <Footer />
       <WhatsAppButton />

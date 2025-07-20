@@ -44,7 +44,7 @@ export default function Navbar() {
             </Link>
 
             <Link href="#customer-diaries">
-              <span className="hover:text-[#8ac63e] cursor-pointer">Customer Diaries</span>
+              <span className="hover:text-[#8ac63e] cursor-pointer">Testimonials</span>
             </Link>
           </>
         }
@@ -76,7 +76,7 @@ export default function Navbar() {
             <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collections</span>
           </Link>
            <Link href="#customer-diaries" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Customer Diaries</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Testimonials</span>
           </Link>
           <Link href="#about" onClick={() => setMenuOpen(false)}>
             <span className="hover:text-[#8ac63e] cursor-pointer uppercase">About</span>
