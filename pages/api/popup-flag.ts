@@ -1,18 +1,62 @@
-import fs from 'fs';
-import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { supabase } from '../../lib/supabase';
 
-const filePath = path.join(process.cwd(), 'data', 'popup-flag.json');
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const data = fs.readFileSync(filePath, 'utf-8');
-    res.status(200).json(JSON.parse(data));
-  } else if (req.method === 'POST') {
-    const { enabled } = req.body;
-    fs.writeFileSync(filePath, JSON.stringify({ enabled }));
-    res.status(200).json({ success: true });
-  } else {
-    res.status(405).end();
+    const { data, error } = await supabase
+      .from('popup_flag')
+      .select('id, enabled')
+      .limit(1)
+      .maybeSingle();
+
+
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data) return res.status(200).json({ enabled: false });
+
+    return res.status(200).json({ enabled: data.enabled });
   }
+
+  if (req.method === 'POST') {
+    const { enabled } = req.body;
+
+    const { data: existing, error: getErr } = await supabase
+      .from('popup_flag')
+      .select('id')
+      .limit(1)
+      .maybeSingle();
+
+
+    if (getErr) {
+      return res.status(500).json({ error: getErr.message });
+    }
+
+    if (!existing) {
+      console.log('📥 No row, inserting new...');
+      const { data, error } = await supabase
+        .from('popup_flag')
+        .insert({ enabled })
+        .select()
+        .maybeSingle();
+
+
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json({ success: true, data });
+    }
+
+    const { data, error } = await supabase
+      .from('popup_flag')
+      .update({ enabled })
+      .eq('id', existing.id)
+      .select()
+      .maybeSingle();
+
+
+    if (error) return res.status(500).json({ error: error.message });
+
+    return res.status(200).json({ success: true, data });
+  }
+
+  res.setHeader('Allow', ['GET', 'POST']);
+  res.status(405).end(`Method ${req.method} Not Allowed`);
 }

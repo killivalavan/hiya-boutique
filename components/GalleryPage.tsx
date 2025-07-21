@@ -16,7 +16,7 @@ export default function GalleryPage({
 }: {
   title: string;
   images: CloudinaryFile[];
-  slug: string
+  slug: string;
 }) {
   const [galleryImages, setGalleryImages] = useState<CloudinaryFile[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -25,10 +25,14 @@ export default function GalleryPage({
 
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   const [recentlyAdded, setRecentlyAdded] = useState<Set<string>>(new Set());
+  const [isModalImageLoaded, setIsModalImageLoaded] = useState(false);
 
   const handleImageLoad = (url: string) => {
     setLoadedImages((prev) => ({ ...prev, [url]: true }));
   };
+
+  const getThumbnailUrl = (url: string) =>
+    url.includes('/upload/') ? url.replace('/upload/', '/upload/w_500,q_70/') : url;
 
   useEffect(() => {
     const storageKey = `gallery_${title}`;
@@ -61,7 +65,9 @@ export default function GalleryPage({
 
   useEffect(() => {
     document.body.style.overflow = selectedImage ? 'hidden' : 'auto';
-    return () => { document.body.style.overflow = 'auto'; };
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [selectedImage]);
 
   const loadMoreImages = () => {
@@ -86,16 +92,19 @@ export default function GalleryPage({
                 <div className="w-full aspect-w-4 aspect-h-3 bg-gray-300 animate-pulse rounded-lg absolute inset-0 z-10" />
               )}
               <Image
-                src={img.url}
+                src={getThumbnailUrl(img.url)}
                 alt=""
-                width={400} height={300}
+                width={400}
+                height={300}
                 className={`w-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 
                   ${loadedImages[img.url] ? '' : 'invisible'} 
-                  ${slug === 'whatsapp-testimonials' ? 'h-48' : 'h-full'}`
-                }
+                  ${slug === 'whatsapp-testimonials' ? 'h-48' : 'h-full'}`}
                 loading="lazy"
                 onLoadingComplete={() => handleImageLoad(img.url)}
-                onClick={() => setSelectedImage(img.url)}
+                onClick={() => {
+                  setSelectedImage(img.url);
+                  setIsModalImageLoaded(false);
+                }}
               />
             </div>
           ))}
@@ -131,36 +140,46 @@ export default function GalleryPage({
               >
                 <button
                   className="absolute top-[-0.2em] text-black text-3xl right-[0.2em]"
-                  onClick={() => setSelectedImage(null)}
+                  onClick={() => {
+                    setSelectedImage(null);
+                    setIsModalImageLoaded(false);
+                  }}
                 >
                   &times;
                 </button>
 
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center mb-4 relative w-full max-h-[75vh]">
+                  {!isModalImageLoaded && (
+                    <div className="absolute top-0 left-0 w-full h-full bg-gray-300 animate-pulse rounded-lg z-10" />
+                  )}
                   <Image
                     src={selectedImage}
                     alt=""
-                    width={1200} height={800}
-                    className="w-full h-auto max-h-[75vh] object-contain"
+                    width={1200}
+                    height={800}
+                    className={`w-full h-auto max-h-[75vh] object-contain rounded-lg z-20 ${
+                      isModalImageLoaded ? 'opacity-100' : 'opacity-0'
+                    } transition-opacity duration-300`}
+                    onLoadingComplete={() => setIsModalImageLoaded(true)}
                   />
                 </div>
 
                 {!(slug === 'whatsapp-testimonials' || slug === 'clients-gallery') && (
-                <WhatsAppButton
-                  message={`Hi, I'm interested in the ${title} collection - ${selectedImage}`}
-                  large
-                  text={
-                    slug === 'aari-embroidery-designing-customisation' ||
-                    slug === 'customization-custom-tailoring' ||
-                    slug === 'pre-pleating' ||
-                    slug === 'mehendi-art' ||
-                    slug === 'bridal-makeup-hair-style' ||
-                    slug === 'training'
-                      ? 'Book now!'
-                      : 'Get The Latest Collections'
-                  }
-                />
-              )}
+                  <WhatsAppButton
+                    message={`Hi, I'm interested in the ${title} collection - ${selectedImage}`}
+                    large
+                    text={
+                      slug === 'aari-embroidery-designing-customisation' ||
+                      slug === 'customization-custom-tailoring' ||
+                      slug === 'pre-pleating' ||
+                      slug === 'mehendi-art' ||
+                      slug === 'bridal-makeup-hair-style' ||
+                      slug === 'training'
+                        ? 'Book now!'
+                        : 'Get The Latest Collections'
+                    }
+                  />
+                )}
               </motion.div>
             </motion.div>
           )}
