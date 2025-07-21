@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../../components/Navbar'
+import Navbar from '../../components/Navbar';
 
 const services = [
   'aari-embroidery-designing-customisation',
@@ -35,6 +35,7 @@ export default function AdminPage() {
   const [files, setFiles] = useState<FileList | null>(null);
   const [existingFiles, setExistingFiles] = useState<CloudinaryFile[]>([]);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+  const [popupEnabled, setPopupEnabled] = useState(false);
 
   useEffect(() => {
     const auth = localStorage.getItem('admin-auth');
@@ -43,6 +44,12 @@ export default function AdminPage() {
     } else {
       setHasAccess(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/popup-flag')
+      .then(res => res.json())
+      .then(data => setPopupEnabled(data.enabled));
   }, []);
 
   useEffect(() => {
@@ -59,6 +66,19 @@ export default function AdminPage() {
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const togglePopup = async () => {
+    const newValue = !popupEnabled;
+    const res = await fetch('/api/popup-flag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: newValue })
+    });
+    if (res.ok) {
+      setPopupEnabled(newValue);
+      showToast(`Popup ${newValue ? 'enabled' : 'disabled'}`, 'success');
+    }
   };
 
   const handleUpload = async () => {
@@ -155,6 +175,22 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white p-6 rounded shadow-md max-w-xl mx-auto">
+          <div className="mb-6 flex items-center justify-between">
+            <span className="font-semibold text-gray-800">Popup Modal:</span>
+            <button
+              onClick={togglePopup}
+              className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 ${
+                popupEnabled ? 'bg-green-500' : 'bg-gray-400'
+              }`}
+            >
+              <span
+                className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${
+                  popupEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+
           <label htmlFor="category" className="block mb-2 font-semibold">
             Select Category
           </label>

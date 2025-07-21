@@ -9,6 +9,7 @@ import CustomerDiaries from '../components/CustomerDiaries'
 import SmallImageCarousel from '../components/SmallImageCarousel'
 import WhatsAppTestimonials from '../components/WhatsAppTestimonials';
 import CustomerBanner from '../components/CustomerBanner'
+import PopupModal from '../components/PopupModal'
 
 
 export default function Home() {
@@ -27,6 +28,7 @@ export default function Home() {
       </main>
       <Footer />
       <WhatsAppButton />
+      <PopupModal />
     </>
   )
 }
