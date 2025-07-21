@@ -7,17 +7,30 @@ export default function PopupModal() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+
     fetch('/api/popup-flag')
       .then(res => res.json())
       .then(data => {
         if (data.enabled) {
           setIsEnabled(true);
-          setShow(true);
-          const interval = setInterval(() => setShow(true), 2 * 60 * 1000);
-          return () => clearInterval(interval);
+
+          // Show only if not shown before in this session
+          const alreadyShown = sessionStorage.getItem('hiya-popup-shown');
+          if (!alreadyShown) {
+            setShow(true);
+            sessionStorage.setItem('hiya-popup-shown', 'true');
+          }
+
+          // Schedule repeated popup every 2 minutes
+          interval = setInterval(() => {
+            setShow(true);
+          }, 2 * 60 * 1000);
         }
       })
       .catch(err => console.error('Failed to fetch popup flag:', err));
+
+    return () => clearInterval(interval);
   }, []);
 
   const closeModal = () => setShow(false);

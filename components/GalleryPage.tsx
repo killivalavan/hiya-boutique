@@ -88,24 +88,25 @@ export default function GalleryPage({
               className={`relative cursor-pointer group w-full 
                 ${recentlyAdded.has(img.url) ? 'ring-4 ring-green-400 animate-pulse' : ''}`}
             >
-              {!loadedImages[img.url] && (
-                <div className="w-full aspect-w-4 aspect-h-3 bg-gray-300 animate-pulse rounded-lg absolute inset-0 z-10" />
-              )}
-              <Image
-                src={getThumbnailUrl(img.url)}
-                alt=""
-                width={400}
-                height={300}
-                className={`w-full object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 
-                  ${loadedImages[img.url] ? '' : 'invisible'} 
-                  ${slug === 'whatsapp-testimonials' ? 'h-48' : 'h-full'}`}
-                loading="lazy"
-                onLoadingComplete={() => handleImageLoad(img.url)}
-                onClick={() => {
-                  setSelectedImage(img.url);
-                  setIsModalImageLoaded(false);
-                }}
-              />
+              <div className="relative w-full pt-[133.33%]">
+                {!loadedImages[img.url] && (
+                  <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg z-10" />
+                )}
+                <Image
+                  src={getThumbnailUrl(img.url)}
+                  alt=""
+                  fill
+                  className={`object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 
+                    ${loadedImages[img.url] ? 'opacity-100' : 'opacity-0'} 
+                    ${slug === 'whatsapp-testimonials' ? 'object-cover' : ''}`}
+                  loading="lazy"
+                  onLoadingComplete={() => handleImageLoad(img.url)}
+                  onClick={() => {
+                    setSelectedImage(img.url);
+                    setIsModalImageLoaded(false);
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>
