@@ -65,7 +65,7 @@ export default function CustomerDiaries() {
     );
 
   return (
-    <div id="customer-diaries" className="w-full px-4 py-10 bg-[#f9f9f9]">
+    <div id="customer-diaries" className="w-full px-4 pb-9 pt-4 bg-[#f9f9f9]">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="lg:w-[50%] lg:ml-auto text-2xl font-bold">Our Happy Clients</h2>

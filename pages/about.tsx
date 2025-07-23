@@ -8,7 +8,7 @@ export default function About() {
       <div className="bg-white text-gray-800 px-6 py-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Our Story</h1>
-          <h2 className="text-xl sm:text-2xl font-semibold text-center text-[#87c03e] mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-center text-[#8bc63e] mb-6">
             HiYa Fashions & Boutique
           </h2>
           <p className="text-center italic text-lg mb-10">Crafted with Love. Styled with Purpose.</p>
@@ -48,7 +48,7 @@ export default function About() {
               Born from faith. Raised by hard work. Nurtured with love.
             </p>
             <p className="text-center text-lg font-semibold mt-6">
-              Step into <span className="text-[#87c03e]">HiYa</span> — where every thread tells a story, and every design is made just for you.
+              Step into <span className="text-[#8bc63e]">HiYa</span> — where every thread tells a story, and every design is made just for you.
             </p>
           </div>
         </div>
