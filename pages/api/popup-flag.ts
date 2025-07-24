@@ -1,42 +1,36 @@
+// /pages/api/popup-flag.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
-const dirPath = path.join(process.cwd(), 'data');
-const filePath = path.join(dirPath, 'popup-flag.json');
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // Make sure to secure this in Vercel secrets
+);
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    try {
-      // ✅ Create folder if not exists
-      if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath);
+    const { data, error } = await supabase
+      .from('popup_flags')
+      .select('enabled')
+      .eq('id', 'global')
+      .single();
 
-      // ✅ Create default file if not exists
-      if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, JSON.stringify({ enabled: false }, null, 2), 'utf-8');
-      }
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(200).json(data);
+  }
 
-      const file = fs.readFileSync(filePath, 'utf-8');
-      const json = JSON.parse(file);
-      res.status(200).json(json);
-    } catch (err) {
-      console.error('[GET popup-flag error]', err);
-      res.status(500).json({ error: 'Failed to read popup flag' });
-    }
-  } else if (req.method === 'POST') {
-    try {
-      const body = req.body;
+  else if (req.method === 'POST') {
+    const { enabled } = req.body;
 
-      // ✅ Ensure folder exists before writing
-      if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath);
+    const { error } = await supabase
+      .from('popup_flags')
+      .upsert({ id: 'global', enabled });
 
-      fs.writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8');
-      res.status(200).json({ success: true });
-    } catch (err) {
-      console.error('[POST popup-flag error]', err);
-      res.status(500).json({ error: 'Failed to update popup flag' });
-    }
-  } else {
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(200).json({ success: true });
+  }
+
+  else {
     res.status(405).json({ error: 'Method not allowed' });
   }
 }
