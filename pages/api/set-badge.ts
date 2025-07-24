@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data, error } = await supabase
       .from('image_badges')
       .upsert([{ public_id, badge: badge || null, category }], {
-        onConflict: ['public_id']
+        onConflict: 'public_id'
       });
 
     if (error) {
