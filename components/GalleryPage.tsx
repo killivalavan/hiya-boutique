@@ -7,6 +7,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 type CloudinaryFile = {
   url: string;
   public_id: string;
+  badge?: string | null;
 };
 
 export default function GalleryPage({
@@ -34,32 +35,46 @@ export default function GalleryPage({
   const getThumbnailUrl = (url: string) =>
     url.includes('/upload/') ? url.replace('/upload/', '/upload/w_500,q_70/') : url;
 
+  const getBadgeGradientClass = (badge: string) => {
+    switch (badge) {
+      case 'Best Seller':
+        return 'from-pink-500 to-red-600';
+      case 'Trending':
+        return 'from-yellow-400 to-orange-500';
+      case 'New':
+        return 'from-green-400 to-green-600';
+      case '100+ Bought':
+        return 'from-sky-500 to-blue-600';
+      default:
+        return 'from-gray-400 to-gray-600';
+    }
+  };
+
   useEffect(() => {
     const storageKey = `gallery_${title}`;
-    let loadedImagesFromCache = false;
-
     try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setGalleryImages(parsed);
-          loadedImagesFromCache = true;
+        const newOrUpdated = images.filter((img) =>
+          !parsed.some((p: any) => p.url === img.url && p.badge === img.badge)
+        );
 
-          const newFiles = images.filter(f => !parsed.some((p: any) => p.url === f.url));
-          if (newFiles.length > 0) {
-            setRecentlyAdded(new Set(newFiles.map(f => f.url)));
-            setTimeout(() => setRecentlyAdded(new Set()), 3000);
-          }
+        if (newOrUpdated.length > 0) {
+          setRecentlyAdded(new Set(newOrUpdated.map(f => f.url)));
+          setTimeout(() => setRecentlyAdded(new Set()), 3000);
+          localStorage.setItem(storageKey, JSON.stringify(images));
+          setGalleryImages(images); // 👈 Always take latest from props
+        } else {
+          setGalleryImages(parsed);
         }
+      } else {
+        localStorage.setItem(storageKey, JSON.stringify(images));
+        setGalleryImages(images);
       }
     } catch (e) {
       console.error("LocalStorage parse error:", e);
-    }
-
-    if (!loadedImagesFromCache) {
       setGalleryImages(images);
-      localStorage.setItem(storageKey, JSON.stringify(images));
     }
   }, [title, images]);
 
@@ -88,6 +103,18 @@ export default function GalleryPage({
               className={`relative cursor-pointer group w-full 
                 ${recentlyAdded.has(img.url) ? 'ring-4 ring-green-400 animate-pulse' : ''}`}
             >
+              {/* Badge UI */}
+              {img.badge && (
+                <span
+                  className={`absolute top-2 left-2 z-20 px-2 py-[2px] text-[10px] font-semibold text-white 
+                             rounded-full shadow
+                             bg-gradient-to-r ${getBadgeGradientClass(img.badge)}`}
+                >
+                  {img.badge}
+                </span>
+              )}
+              
+
               <div className="relative w-full pt-[133.33%]">
                 {!loadedImages[img.url] && (
                   <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg z-10" />

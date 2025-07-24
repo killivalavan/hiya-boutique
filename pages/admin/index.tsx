@@ -26,6 +26,7 @@ const collections = [
 type CloudinaryFile = {
   url: string;
   public_id: string;
+  badge?: string | null;
 };
 
 export default function AdminPage() {
@@ -39,11 +40,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     const auth = localStorage.getItem('admin-auth');
-    if (auth === 'true') {
-      setHasAccess(true);
-    } else {
-      setHasAccess(false);
-    }
+    if (auth === 'true') setHasAccess(true);
+    else setHasAccess(false);
   }, []);
 
   useEffect(() => {
@@ -86,7 +84,6 @@ export default function AdminPage() {
       showToast('Please select category and images', 'error');
       return;
     }
-
     if (files.length > 5) {
       showToast('You can upload a maximum of 5 images at a time', 'error');
       return;
@@ -94,12 +91,12 @@ export default function AdminPage() {
 
     const formData = new FormData();
     formData.append('category', selectedCategory);
-    Array.from(files).forEach((file) => formData.append('images', file));
+    Array.from(files).forEach(file => formData.append('images', file));
 
     try {
       const res = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        body: formData
       });
 
       const data = await res.json();
@@ -107,9 +104,11 @@ export default function AdminPage() {
         showToast('Upload successful!', 'success');
         setFiles(null);
         (document.getElementById('images') as HTMLInputElement).value = '';
-        fetch(`/api/list?category=${selectedCategory}`)
-          .then(res => res.json())
-          .then(data => setExistingFiles(data.files || []));
+
+        // 👇 Append new files to the top of the list
+        if (data?.files?.length) {
+          setExistingFiles(prev => [...data.files, ...prev]);
+        }
       } else {
         showToast('Upload failed: ' + (data?.error || 'Unknown error'), 'error');
       }
@@ -143,6 +142,38 @@ export default function AdminPage() {
     }
   };
 
+  const handleBadgeChange = async (file: CloudinaryFile, newBadge: string) => {
+    const badgeValue = newBadge || null;
+
+    if (!file.public_id || !selectedCategory) {
+      showToast('One or more required fields are missing', 'error');
+      return;
+    }
+
+    const res = await fetch(`${window.location.origin}/api/set-badge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        public_id: file.public_id,
+        badge: badgeValue,
+        category: selectedCategory
+      })
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      showToast('Badge updated!', 'success');
+      setExistingFiles(prev =>
+        prev.map(f =>
+          f.public_id === file.public_id ? { ...f, badge: badgeValue } : f
+        )
+      );
+    } else {
+      console.error('Badge update failed:', result.error);
+      showToast('Failed to update badge', 'error');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('admin-auth');
     router.push('/admin/login');
@@ -153,7 +184,7 @@ export default function AdminPage() {
     return (
       <>
         <Navbar />
-        <div style={{ height: '90vh' }} className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
           <p className="text-red-600 font-medium">Access Denied. Please login.</p>
         </div>
       </>
@@ -163,7 +194,7 @@ export default function AdminPage() {
   return (
     <>
       <Navbar />
-      <div style={{ height: '90vh' }} className="min-h-screen p-6 bg-gray-100 overflow-y-auto">
+      <div className="min-h-screen p-6 bg-gray-100 overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Admin Upload Panel</h1>
           <button
@@ -179,39 +210,27 @@ export default function AdminPage() {
             <span className="font-semibold text-gray-800">Popup Modal:</span>
             <button
               onClick={togglePopup}
-              className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 ${
-                popupEnabled ? 'bg-green-500' : 'bg-gray-400'
-              }`}
+              className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 ${popupEnabled ? 'bg-green-500' : 'bg-gray-400'}`}
             >
               <span
-                className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${
-                  popupEnabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${popupEnabled ? 'translate-x-6' : 'translate-x-1'}`}
               />
             </button>
           </div>
 
-          <label htmlFor="category" className="block mb-2 font-semibold">
-            Select Category
-          </label>
+          <label htmlFor="category" className="block mb-2 font-semibold">Select Category</label>
           <select
             id="category"
-            name="category"
-            autoComplete="off"
             className="w-full mb-4 p-2 border rounded"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="">-- Select --</option>
             <optgroup label="Services">
-              {services.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {services.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </optgroup>
             <optgroup label="New Collections">
-              {collections.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {collections.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </optgroup>
             <optgroup label="Client Gallery">
               <option value="clients-gallery">Clients Gallery</option>
@@ -219,16 +238,12 @@ export default function AdminPage() {
             </optgroup>
           </select>
 
-          <label htmlFor="images" className="block mb-2 font-semibold">
-            Choose Images (max 5)
-          </label>
+          <label htmlFor="images" className="block mb-2 font-semibold">Choose Images (max 5)</label>
           <input
             id="images"
-            name="images"
             type="file"
             multiple
             accept="image/*"
-            autoComplete="off"
             className="mb-4 w-full"
             onChange={(e) => setFiles(e.target.files)}
           />
@@ -248,13 +263,30 @@ export default function AdminPage() {
               <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                 {existingFiles.map((file) => (
                   <div key={file.public_id} className="relative w-32 h-32 border rounded overflow-hidden">
-                    <img src={file.url} alt="" className="w-full h-full object-cover" />
+                    <img
+                      src={file.url.replace('/upload/', '/upload/w_200,q_60/')}
+                      alt=""
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
                     <button
                       onClick={() => handleDelete(file)}
-                      className="pb-1 absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
                     >
                       &times;
                     </button>
+
+                    <select
+                      className="absolute bottom-1 left-1 text-xs px-1 py-[2px] bg-white bg-opacity-90 border rounded"
+                      value={file.badge || ''}
+                      onChange={(e) => handleBadgeChange(file, e.target.value)}
+                    >
+                      <option value="">No Badge</option>
+                      <option value="Best Seller">Best Seller</option>
+                      <option value="Trending">Trending</option>
+                      <option value="New">New</option>
+                      <option value="100+ Bought">100+ Bought</option>
+                    </select>
                   </div>
                 ))}
               </div>

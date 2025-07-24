@@ -25,6 +25,7 @@ const categoryTitles: Record<string, string> = {
 type CloudinaryFile = {
   url: string;
   public_id: string;
+  badge?: string | null;
 };
 
 export default function DynamicGalleryPage({
@@ -41,11 +42,7 @@ export default function DynamicGalleryPage({
   return (
     <>
       <Navbar />
-      <GalleryPage
-        title={title}
-        images={images}
-        slug={slug}
-      />
+      <GalleryPage title={title} images={images} slug={slug} />
     </>
   );
 }
@@ -53,13 +50,28 @@ export default function DynamicGalleryPage({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slug = context.params?.slug as string;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/list?category=${slug}`);
-  const data = await res.json();
+  const protocol = context.req.headers['x-forwarded-proto'] || 'http';
+  const host = context.req.headers.host;
+  const baseUrl = `${protocol}://${host}`;
 
-  return {
-    props: {
-      slug,
-      images: data.files || [],
-    },
-  };
+  try {
+    const res = await fetch(`${baseUrl}/api/list?category=${slug}`);
+    const contentType = res.headers.get('content-type') || '';
+
+    if (!res.ok || !contentType.includes('application/json')) {
+      const html = await res.text();
+      return { notFound: true };
+    }
+
+    const data = await res.json();
+
+    return {
+      props: {
+        slug,
+        images: data.files || [],
+      },
+    };
+  } catch (err) {
+    return { notFound: true };
+  }
 };
