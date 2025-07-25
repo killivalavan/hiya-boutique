@@ -41,7 +41,7 @@ export default function Navbar() {
             </Link>
           
             <Link href="#collections">
-              <span className="hover:text-[#8ac63e] cursor-pointer">Collections</span>
+              <span className="hover:text-[#8ac63e] animate-blink-green">Collections</span>
             </Link>
 
             <Link href="#customer-diaries">
@@ -68,19 +68,19 @@ export default function Navbar() {
       {menuOpen && (
         <div className="absolute top-[66px] left-0 w-full bg-black text-white flex flex-col items-start px-6 py-4 space-y-4 sm:hidden z-50 shadow-lg">
           <Link href="/" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Home</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer">Home</span>
           </Link>
            <Link href="#collections" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Services</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer">Services</span>
           </Link>
           <Link href="#collections" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Collections</span>
+            <span className="hover:text-[#8ac63e] animate-blink-green">Collections</span>
           </Link>
            <Link href="#customer-diaries" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">Testimonials</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer">Testimonials</span>
           </Link>
           <Link href="/about" onClick={() => setMenuOpen(false)}>
-            <span className="hover:text-[#8ac63e] cursor-pointer uppercase">About</span>
+            <span className="hover:text-[#8ac63e] cursor-pointer">About</span>
           </Link>
         </div>
       )}

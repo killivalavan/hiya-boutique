@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import Navbar from '../components/Navbar';
@@ -46,8 +47,55 @@ export default function Home() {
     });
   }, [router]);
 
+  const siteUrl = 'https://www.hiyaboutique.in'; // Update if different
+
+  const schemaOrg = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Hiya Fashions & Boutique",
+    "url": siteUrl,
+    "logo": `${siteUrl}/logo.png`,
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "telephone": "+91 72999 27172",
+        "contactType": "Customer Support"
+      },
+      {
+        "@type": "ContactPoint",
+        "telephone": "+91 86102 03368",
+        "contactType": "Customer Support"
+      }
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "No. 21, RKV Avenue Main Road, Zamin Pallavaram",
+      "addressLocality": "Chennai",
+      "postalCode": "600117",
+      "addressCountry": "IN"
+    },
+    "sameAs": [
+      "https://www.instagram.com/hiya_instore/",
+      "https://www.facebook.com/ilakkiya2017",
+      "https://www.youtube.com/@hiyafashionsandboutique"
+    ]
+  };
+
   return (
     <>
+      <Head>
+        <title>Hiya Boutique – Best Boutique in Chennai for Custom Tailoring & Sarees</title>
+        <meta
+          name="description"
+          content="Hiya Fashions & Boutique offers custom tailoring, Aari embroidery, bridal makeover, and exclusive saree collections in Chennai. Book your style today!"
+        />
+        <link rel="canonical" href={siteUrl} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+        />
+      </Head>
+
       <Navbar />
       <main id="home" className="overflow-x-hidden">
         <Carousel />

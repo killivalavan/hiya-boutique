@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.hiyaboutique.in
+
+# Sitemaps
+Sitemap: https://www.hiyaboutique.in/sitemap.xml

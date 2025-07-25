@@ -1,0 +1,16 @@
+{
+  "name": "Hiya Fashions & Boutique",
+  "short_name": "Hiya Boutique",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#be185d",
+  "description": "Custom tailoring, Aari embroidery, bridal makeovers, and unique saree collections in Chennai.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
