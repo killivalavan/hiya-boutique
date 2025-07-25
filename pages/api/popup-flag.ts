@@ -4,33 +4,39 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Make sure to secure this in Vercel secrets
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const { data, error } = await supabase
-      .from('popup_flags')
+      .from('popup_flag')
       .select('enabled')
-      .eq('id', 'global')
+      .eq('id', 1) // ✅ match numeric ID
       .single();
 
-    if (error) return res.status(500).json({ error: error.message });
-    res.status(200).json(data);
+    if (error) {
+      console.error('[GET] Supabase error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(200).json(data);
   }
 
-  else if (req.method === 'POST') {
+  if (req.method === 'POST') {
     const { enabled } = req.body;
 
     const { error } = await supabase
-      .from('popup_flags')
-      .upsert({ id: 'global', enabled });
+      .from('popup_flag')
+      .upsert({ id: 1, enabled }); // ✅ use numeric ID
 
-    if (error) return res.status(500).json({ error: error.message });
-    res.status(200).json({ success: true });
+    if (error) {
+      console.error('[POST] Supabase error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(200).json({ success: true });
   }
 
-  else {
-    res.status(405).json({ error: 'Method not allowed' });
-  }
+  return res.status(405).json({ error: 'Method not allowed' });
 }
