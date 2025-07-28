@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const collections = [
   'Silk Sarees',
@@ -28,7 +29,9 @@ export default function Collections() {
             <Link href={`/gallery/${slug}`} key={index}>
               <div className="bg-white shadow rounded p-4 text-center cursor-pointer hover:bg-gray-50 transition">
                 <div className="overflow-hidden rounded h-64"> {/* Uniform height */}
-                  <img
+                  <Image
+                    width={400}
+                    height={400}
                     src={`/categories/${slug}.png`}
                     alt={item}
                     className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-105"

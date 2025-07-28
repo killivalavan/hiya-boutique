@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true, // Optional if you're using static images from /public
+    domains: ['res.cloudinary.com'],
   },
   output: 'standalone',
 };

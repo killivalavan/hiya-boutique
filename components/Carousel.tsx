@@ -6,13 +6,15 @@ import { motion } from "framer-motion";
 
 const slides = [
   {
-    src: "/carousel/c1.png",
+    src: "/carousel/c1.webp",
+    blurDataURL: "/carousel/c1-blur.webp",
     alt: "Happy Clients",
     text: <>Our <span className="text-pink-500">happy clients</span> are our biggest achievement.</>,
     button: null,
   },
   {
-    src: "/carousel/c2.png",
+    src: "/carousel/c2.webp",
+    blurDataURL: "/carousel/c2-blur.webp",
     alt: "kurtis and kurti sets",
     text: <>
       <span className="text-pink-500">Elegance</span> in Every Thread. <span className="text-pink-500">Passion</span> in Every Stitch.
@@ -23,7 +25,8 @@ const slides = [
     },
   },
   {
-    src: "/carousel/c3.png",
+    src: "/carousel/c3.webp",
+    blurDataURL: "/carousel/c3-blur.webp",
     alt: "Mehendi Art",
     text: <>
       Crafting <span className="text-pink-500">elegance</span> in every swirl of <span className="text-pink-500">Mehendi</span>.
@@ -34,7 +37,8 @@ const slides = [
     },
   },
   {
-    src: "/carousel/c4.png",
+    src: "/carousel/c4.webp",
+    blurDataURL: "/carousel/c4-blur.webp",
     alt: "Casual and party sarees",
     text: <>
       Every pleat whispers <span className="text-pink-500">tradition</span>, every drape radiates <span className="text-pink-500">grace</span>.
@@ -64,10 +68,12 @@ export default function ImageCarousel() {
               src={slide.src}
               alt={slide.alt}
               fill
-              unoptimized
               priority={index === 0}
               className="object-cover w-full h-full"
               sizes="(max-width: 768px) 100vw, 100vw"
+              placeholder="blur"
+              blurDataURL={slide.blurDataURL}
+              quality={100}
             />
 
             <div className="w-[90%] max-w-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-20">

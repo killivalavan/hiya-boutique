@@ -1,33 +1,51 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-
+import dynamic from 'next/dynamic';
 import Navbar from '../components/Navbar';
-import Carousel from '../components/Carousel';
 import Footer from '../components/Footer';
-import Services from '../components/Services';
-import Collections from '../components/Collections';
-import Banner from '../components/Banner';
 import { WhatsAppButton } from '../components/WhatsAppButton';
-import CustomerDiaries from '../components/CustomerDiaries';
-import SmallImageCarousel from '../components/SmallImageCarousel';
-import WhatsAppTestimonials from '../components/WhatsAppTestimonials';
-import CustomerBanner from '../components/CustomerBanner';
-import PopupModal from '../components/PopupModal';
+const Banner = dynamic(() => import('../components/Banner'), { ssr: false });
+const PopupModal = dynamic(() => import('../components/PopupModal'), { ssr: false });
+const SmallImageCarousel = dynamic(() => import('../components/SmallImageCarousel'), { ssr: false });
+const WhatsAppTestimonials = dynamic(() => import('../components/WhatsAppTestimonials'), { ssr: false });
+const CustomerBanner = dynamic(() => import('../components/CustomerBanner'), { ssr: false });
+
+// Skeletons
+import SkeletonServices from '../components/skeletons/SkeletonServices';
+import SkeletonCollections from '../components/skeletons/SkeletonCollections';
+import SkeletonClientsGallery from '../components/skeletons/SkeletonClientsGallery';
+import SkeletonCarousel from '../components/skeletons/SkeletonCarousel';
+
+// Lazy components
+const Carousel = dynamic(() => import('../components/Carousel'), {
+  ssr: false,
+  loading: () => <SkeletonCarousel />,
+});
+const LazyServices = dynamic(() => import('../components/Services'), {
+  ssr: false,
+  loading: () => <SkeletonServices />,
+});
+const LazyCollections = dynamic(() => import('../components/Collections'), {
+  ssr: false,
+  loading: () => <SkeletonCollections />,
+});
+const LazyCustomerDiaries = dynamic(() => import('../components/CustomerDiaries'), {
+  ssr: false,
+  loading: () => <SkeletonClientsGallery />,
+});
 
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
     const slugs = [
-      // Services
       'aari-embroidery-designing-customisation',
       'customization-custom-tailoring',
       'pre-pleating',
       'mehendi-art',
       'bridal-makeup-hair-style',
       'training',
-      // Collections
       'silk-sarees',
       'casual-party-wear-sarees',
       'salwar-suits-unstitched',
@@ -37,7 +55,6 @@ export default function Home() {
       'maxi-frocks',
       'home-decors',
       'artificial-jewellery',
-      // Client Gallery
       'clients-gallery',
       'whatsapp-testimonials'
     ];
@@ -47,7 +64,7 @@ export default function Home() {
     });
   }, [router]);
 
-  const siteUrl = 'https://www.hiyaboutique.in'; // Update if different
+  const siteUrl = 'https://www.hiyaboutique.in';
 
   const schemaOrg = {
     "@context": "https://schema.org",
@@ -99,10 +116,10 @@ export default function Home() {
       <Navbar />
       <main id="home" className="overflow-x-hidden">
         <Carousel />
-        <Services />
+        <LazyServices />
         <Banner />
-        <Collections />
-        <CustomerDiaries />
+        <LazyCollections />
+        <LazyCustomerDiaries />
         <CustomerBanner />
         <WhatsAppTestimonials />
         <SmallImageCarousel />

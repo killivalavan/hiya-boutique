@@ -1,7 +1,15 @@
-import { GetServerSideProps } from 'next';
-import GalleryPage from '../../components/GalleryPage';
-import Navbar from '../../components/Navbar';
+// pages/gallery/[slug].tsx
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import Navbar from '../../components/Navbar';
+import SkeletonGalleryPage from '../../components/skeletons/SkeletonGalleryPage';
+
+const GalleryPage = dynamic(() => import('../../components/GalleryPage'), {
+  ssr: false,
+});
 
 const categoryTitles: Record<string, string> = {
   'silk-sarees': 'Silk Sarees',
@@ -20,7 +28,7 @@ const categoryTitles: Record<string, string> = {
   'bridal-makeup-hair-style': 'Bridal Makeup & Hair Style',
   'training': 'Training',
   'clients-gallery': 'Clients Gallery',
-  'whatsapp-testimonials': 'Words From WhatsApp'
+  'whatsapp-testimonials': 'Words From WhatsApp',
 };
 
 type CloudinaryFile = {
@@ -29,20 +37,35 @@ type CloudinaryFile = {
   badge?: string | null;
 };
 
-export default function DynamicGalleryPage({
-  slug,
-  images,
-}: {
-  slug: string;
-  images: CloudinaryFile[];
-}) {
+export default function DynamicGalleryPage() {
+  const router = useRouter();
+  const { slug } = router.query;
+  const [images, setImages] = useState<CloudinaryFile[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const title =
-    categoryTitles[slug] ||
-    slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    typeof slug === 'string'
+      ? categoryTitles[slug] || slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+      : '';
+
+  useEffect(() => {
+    if (!slug) return;
+
+    setLoading(true);
+    fetch(`/api/list?category=${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setImages(data.files || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setImages([]);
+        setLoading(false);
+      });
+  }, [slug]);
 
   const pageTitle = `Hiya Boutique – ${title}`;
   const pageDescription = `Browse the latest ${title.toLowerCase()} at Hiya Boutique. Discover elegance, customization, and handcrafted perfection.`;
-
   const ogImage = images?.[0]?.url || '/default-og-image.jpg';
 
   return (
@@ -67,7 +90,7 @@ export default function DynamicGalleryPage({
         <meta name="twitter:image" content={ogImage} />
 
         {/* Canonical URL */}
-        <link rel="canonical" href={`https://hiyaboutique.in/gallery/${slug}`} />
+        {slug && <link rel="canonical" href={`https://hiyaboutique.in/gallery/${slug}`} />}
       </Head>
 
       <Navbar />
@@ -77,38 +100,13 @@ export default function DynamicGalleryPage({
           <h1 id="gallery-heading" className="sr-only">
             {title}
           </h1>
-          <GalleryPage title={title} images={images} slug={slug} />
+          {loading || !images ? (
+            <SkeletonGalleryPage />
+          ) : (
+            <GalleryPage title={title} images={images} slug={slug as string} />
+          )}
         </section>
       </main>
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const slug = context.params?.slug as string;
-
-  const protocol = context.req.headers['x-forwarded-proto'] || 'http';
-  const host = context.req.headers.host;
-  const baseUrl = `${protocol}://${host}`;
-
-  try {
-    const res = await fetch(`${baseUrl}/api/list?category=${slug}`);
-    const contentType = res.headers.get('content-type') || '';
-
-    if (!res.ok || !contentType.includes('application/json')) {
-      const html = await res.text();
-      return { notFound: true };
-    }
-
-    const data = await res.json();
-
-    return {
-      props: {
-        slug,
-        images: data.files || [],
-      },
-    };
-  } catch (err) {
-    return { notFound: true };
-  }
-};
