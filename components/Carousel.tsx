@@ -3,6 +3,7 @@ import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const slides = [
   {
@@ -51,6 +52,12 @@ const slides = [
 ];
 
 export default function ImageCarousel() {
+  const [loadedSlides, setLoadedSlides] = useState<Set<number>>(new Set());
+
+  const handleImageLoad = (index: number) => {
+    setLoadedSlides((prev) => new Set(prev).add(index));
+  };
+
   return (
     <div className="w-full overflow-hidden custom-carousel">
       <Carousel
@@ -74,33 +81,36 @@ export default function ImageCarousel() {
               placeholder="blur"
               blurDataURL={slide.blurDataURL}
               quality={100}
+              onLoadingComplete={() => handleImageLoad(index)}
             />
 
-            <div className="w-[90%] max-w-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-20">
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="font-bold text-xl sm:text-2xl md:text-5xl leading-snug md:leading-[1.4]"
-              >
-                {slide.text}
-              </motion.div>
-
-              {slide.button && (
+            {loadedSlides.has(index) && (
+              <div className="w-[90%] max-w-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-20">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="font-bold text-xl sm:text-2xl md:text-5xl leading-snug md:leading-[1.4]"
                 >
-                  <Link
-                    href={slide.button.href}
-                    className="mt-4 inline-block text-sm sm:text-base md:text-lg font-semibold bg-pink-500 hover:bg-pink-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-md transition"
-                  >
-                    {slide.button.label}
-                  </Link>
+                  {slide.text}
                 </motion.div>
-              )}
-            </div>
+
+                {slide.button && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+                  >
+                    <Link
+                      href={slide.button.href}
+                      className="mt-4 inline-block text-sm sm:text-base md:text-lg font-semibold bg-pink-500 hover:bg-pink-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-md transition"
+                    >
+                      {slide.button.label}
+                    </Link>
+                  </motion.div>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </Carousel>

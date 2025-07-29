@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from './Footer';
@@ -23,13 +23,14 @@ export default function GalleryPage({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [isModalImageLoaded, setIsModalImageLoaded] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const imagesPerPage = 12;
 
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   const [errorImages, setErrorImages] = useState<Record<string, boolean>>({});
   const [recentlyAdded, setRecentlyAdded] = useState<Set<string>>(new Set());
 
-  const fallbackImage = '/image-not-found.png'; // Place your fallback image in public folder
+  const fallbackImage = '/image-not-found.png';
 
   const handleImageLoad = (url: string) => {
     setLoadedImages((prev) => ({ ...prev, [url]: true }));
@@ -82,6 +83,7 @@ export default function GalleryPage({
       console.error("LocalStorage parse error:", e);
       setGalleryImages(images);
     }
+    setTimeout(() => setIsInitialLoading(false), 500); // simulate short shimmer
   }, [title, images]);
 
   useEffect(() => {
@@ -105,58 +107,64 @@ export default function GalleryPage({
         <h1 className="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-8 text-start">{title}</h1>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {imagesToShow.map((img) => {
-            const displayUrl = errorImages[img.url] ? fallbackImage : getThumbnailUrl(img.url);
-            return (
-              <div
-                key={img.public_id}
-                className={`relative cursor-pointer group w-full 
-                  ${recentlyAdded.has(img.url) ? 'ring-4 ring-green-400 animate-pulse' : ''}`}
-              >
-                {img.badge && (
-                  <span
-                    className={`absolute top-2 left-2 z-20 px-2 py-[2px] text-[10px] font-semibold text-white 
-                               rounded-full shadow
-                               bg-gradient-to-r ${getBadgeGradientClass(img.badge)}`}
+          {isInitialLoading
+            ? Array.from({ length: imagesPerPage }).map((_, index) => (
+                <div key={index} className="relative w-full pt-[133.33%] bg-gray-300 animate-pulse rounded-lg" />
+              ))
+            : imagesToShow.map((img) => {
+                const displayUrl = errorImages[img.url] ? fallbackImage : getThumbnailUrl(img.url);
+                return (
+                  <div
+                    key={img.public_id}
+                    className={`relative cursor-pointer group w-full 
+                    ${recentlyAdded.has(img.url) ? 'ring-[3px] ring-[#FFD700] animate-pulse' : ''}`}
                   >
-                    {img.badge}
-                  </span>
-                )}
+                    {img.badge && (
+                      <span
+                        className={`absolute top-2 left-2 z-20 px-2 py-[2px] text-[10px] font-semibold text-white 
+                                   rounded-full shadow
+                                   bg-gradient-to-r ${getBadgeGradientClass(img.badge)}`}
+                      >
+                        {img.badge}
+                      </span>
+                    )}
 
-                <div className="relative w-full pt-[133.33%]">
-                  {!loadedImages[img.url] && (
-                    <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg z-10" />
-                  )}
-                  <Image
-                    src={displayUrl}
-                    alt=""
-                    fill
-                    className={`object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 
-                      ${loadedImages[img.url] ? 'opacity-100' : 'opacity-0'} 
-                      ${slug === 'whatsapp-testimonials' ? 'object-cover' : ''}`}
-                    loading="lazy"
-                    onLoadingComplete={() => handleImageLoad(img.url)}
-                    onError={() => handleImageError(img.url)}
-                    onClick={() => {
-                      setSelectedImage(img.url);
-                      setIsModalImageLoaded(false);
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+                    <div className="relative w-full pt-[133.33%]">
+                      {!loadedImages[img.url] && (
+                        <div className="absolute inset-0 bg-gray-300 animate-pulse rounded-lg z-10" />
+                      )}
+                      <Image
+                        src={displayUrl}
+                        alt=""
+                        fill
+                        className={`object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 
+                          ${loadedImages[img.url] ? 'opacity-100' : 'opacity-0'} 
+                          ${slug === 'whatsapp-testimonials' ? 'object-cover' : ''}`}
+                        loading="lazy"
+                        onLoadingComplete={() => handleImageLoad(img.url)}
+                        onError={() => handleImageError(img.url)}
+                        onClick={() => {
+                          setSelectedImage(img.url);
+                          setIsModalImageLoaded(false);
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
         </div>
 
-        <div className="flex justify-center mt-8">
-          <button
-            className="text-black px-6 py-2 rounded-lg transition"
-            onClick={loadMoreImages}
-            disabled={page * imagesPerPage >= galleryImages.length}
-          >
-            {page * imagesPerPage < galleryImages.length ? 'Tap to load more...' : ''}
-          </button>
-        </div>
+        {!isInitialLoading && (
+          <div className="flex justify-center mt-8">
+            <button
+              className="text-black px-6 py-2 rounded-lg transition"
+              onClick={loadMoreImages}
+              disabled={page * imagesPerPage >= galleryImages.length}
+            >
+              {page * imagesPerPage < galleryImages.length ? 'Tap to load more...' : ''}
+            </button>
+          </div>
+        )}
 
         <AnimatePresence>
           {selectedImage && (

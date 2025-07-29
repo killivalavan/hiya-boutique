@@ -5,17 +5,16 @@ import dynamic from 'next/dynamic';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { WhatsAppButton } from '../components/WhatsAppButton';
-const Banner = dynamic(() => import('../components/Banner'), { ssr: false });
-const PopupModal = dynamic(() => import('../components/PopupModal'), { ssr: false });
-const SmallImageCarousel = dynamic(() => import('../components/SmallImageCarousel'), { ssr: false });
-const WhatsAppTestimonials = dynamic(() => import('../components/WhatsAppTestimonials'), { ssr: false });
-const CustomerBanner = dynamic(() => import('../components/CustomerBanner'), { ssr: false });
 
 // Skeletons
 import SkeletonServices from '../components/skeletons/SkeletonServices';
 import SkeletonCollections from '../components/skeletons/SkeletonCollections';
 import SkeletonClientsGallery from '../components/skeletons/SkeletonClientsGallery';
 import SkeletonCarousel from '../components/skeletons/SkeletonCarousel';
+import SkeletonBanner from '../components/skeletons/SkeletonBanner';
+import SkeletonTestimonials from '../components/skeletons/SkeletonWhatsAppTestimonials';
+import SkeletonCustomerBanner from '../components/skeletons/SkeletonCustomerBanner';
+import SkeletonSmallCarousel from '../components/skeletons/SkeletonSmallImageCarousel';
 
 // Lazy components
 const Carousel = dynamic(() => import('../components/Carousel'), {
@@ -34,6 +33,23 @@ const LazyCustomerDiaries = dynamic(() => import('../components/CustomerDiaries'
   ssr: false,
   loading: () => <SkeletonClientsGallery />,
 });
+const LazyBanner = dynamic(() => import('../components/Banner'), {
+  ssr: false,
+  loading: () => <SkeletonBanner />,
+});
+const LazyTestimonials = dynamic(() => import('../components/WhatsAppTestimonials'), {
+  ssr: false,
+  loading: () => <SkeletonTestimonials />,
+});
+const LazyCustomerBanner = dynamic(() => import('../components/CustomerBanner'), {
+  ssr: false,
+  loading: () => <SkeletonCustomerBanner />,
+});
+const LazySmallCarousel = dynamic(() => import('../components/SmallImageCarousel'), {
+  ssr: false,
+  loading: () => <SkeletonSmallCarousel />,
+});
+const PopupModal = dynamic(() => import('../components/PopupModal'), { ssr: false });
 
 export default function Home() {
   const router = useRouter();
@@ -117,12 +133,12 @@ export default function Home() {
       <main id="home" className="overflow-x-hidden">
         <Carousel />
         <LazyServices />
-        <Banner />
+        <LazyBanner />
         <LazyCollections />
         <LazyCustomerDiaries />
-        <CustomerBanner />
-        <WhatsAppTestimonials />
-        <SmallImageCarousel />
+        <LazyCustomerBanner />
+        <LazyTestimonials />
+        <LazySmallCarousel />
       </main>
       <Footer />
       <WhatsAppButton />

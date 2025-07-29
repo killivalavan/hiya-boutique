@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 const screenshots = [
   '/whatsapp-testimonials/wa-1.jpeg',
@@ -9,6 +10,32 @@ const screenshots = [
   '/whatsapp-testimonials/wa-3.jpeg',
   '/whatsapp-testimonials/wa-4.jpeg',
 ];
+
+function WhatsAppImage({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative rounded-lg border-2 border-gray-300 p-2 shadow-lg bg-white w-full">
+      {!loaded && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-md" />
+      )}
+
+      <img
+        src={error ? '/default-image.jpeg' : src}
+        alt={alt}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setError(true);
+          setLoaded(true);
+        }}
+        className={`w-full h-40 sm:h-48 md:h-64 object-cover rounded-md transition-opacity duration-500 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+    </div>
+  );
+}
 
 export default function WhatsAppTestimonials() {
   return (
@@ -22,17 +49,13 @@ export default function WhatsAppTestimonials() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {screenshots.map((img, idx) => (
             <motion.div
-                key={idx}
-                className="relative rounded-lg border-2 border-grey p-2 shadow-lg bg-white" // <-- Black border + padding + white background
-                whileHover={{ scale: 1.05 }}
+              key={idx}
+              whileHover={{ scale: 1.05 }}
+              className="w-full"
             >
-                <img
-                    src={img}
-                    alt={`WhatsApp feedback ${idx + 1}`}
-                    className="w-full h-40 sm:h-48 md:h-64 object-cover rounded-md"
-                />
+              <WhatsAppImage src={img} alt={`WhatsApp feedback ${idx + 1}`} />
             </motion.div>
-            ))}
+          ))}
         </div>
 
         <Link

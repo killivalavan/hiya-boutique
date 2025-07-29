@@ -50,15 +50,22 @@ export default function Services() {
             <Link href={`/gallery/${service.slug}`} key={service.slug}>
               <div className="flex flex-col items-center text-center cursor-pointer">
                 <div className="relative w-60 h-60">
+                  {/* Shimmer layer */}
+                  <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse z-0" />
+                  
                   <Image
                     src={service.image}
                     alt={service.name}
                     fill
-                    className="object-cover rounded-full transition-transform duration-300 hover:scale-105"
+                    className="object-cover rounded-full transition-transform duration-300 hover:scale-105 z-10"
                     sizes="(max-width: 768px) 100vw, 240px"
                     priority
                     placeholder="blur"
                     blurDataURL={service.blurDataURL}
+                    onLoad={(e) => {
+                      const shimmer = (e.target as HTMLImageElement).previousSibling as HTMLElement;
+                      if (shimmer) shimmer.style.display = 'none';
+                    }}
                   />
                 </div>
                 <p className="mt-4 font-medium">{service.name}</p>
