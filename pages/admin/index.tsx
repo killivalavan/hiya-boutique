@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../../components/Navbar';
+import Head from 'next/head';
 
 const services = [
   'aari-embroidery-designing-customisation',
@@ -193,6 +194,21 @@ export default function AdminPage() {
 
   return (
     <>
+      <Head>
+        <title>Admin Panel – Harsha's Boutique</title>
+        <meta name="description" content="Admin panel for managing uploads, categories, and popup settings at Harsha's Boutique." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charSet="utf-8" />
+        <meta name="robots" content="noindex, nofollow" />
+        
+        {/* Favicons */}
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+      </Head>
+
       <Navbar />
       <div className="min-h-screen p-6 bg-gray-100 overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
