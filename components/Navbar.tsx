@@ -17,15 +17,15 @@ export default function Navbar() {
     <nav className="bg-black text-white px-6 py-4 flex justify-between items-center h-[66px]">
       {/* Logo + Brand */}
       <Link href="/">
-        <div className="relative w-[100px] h-[100px] hover:scale-105 transition-transform duration-300">
-          <Image 
-            src="/logo.png" 
-            alt="Logo" 
-            fill 
-            className="object-contain"
-            priority
-          />
-        </div>
+        <div className="relative w-[100px] h-[70px] overflow-hidden">
+      <Image 
+        src="/logo.png" 
+        alt="Logo" 
+        fill 
+        className="object-contain"
+        priority
+      />
+    </div>
       </Link>
 
       {/* Desktop Links */}
