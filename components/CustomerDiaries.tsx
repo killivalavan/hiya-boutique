@@ -4,7 +4,6 @@ import { FcGoogle } from "react-icons/fc";
 import { RiGalleryLine } from 'react-icons/ri';
 import { FcPicture } from 'react-icons/fc';
 import { motion } from "framer-motion";
-import Link from 'next/link';
 
 export default function CustomerDiaries() {
   const diaries = [

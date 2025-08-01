@@ -80,7 +80,7 @@ export default function Home() {
     });
   }, [router]);
 
-  const siteUrl = 'https://www.hiyaboutique.in';
+  const siteUrl = 'https://www.hiyafashions.com';
 
   const schemaOrg = {
     "@context": "https://schema.org",

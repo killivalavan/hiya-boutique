@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { policyMap } from './policyDetails';
 
 export default function Footer() {
-  const email = "hiyatrends@gmail.com";
+  const email = "hello@hiyafashions.com";
   const [showScrollButton, setShowScrollButton] = useState(false);
   const footerRef = useRef(null);
   const [modalContent, setModalContent] = useState<null | string>(null);

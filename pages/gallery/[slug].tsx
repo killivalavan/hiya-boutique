@@ -90,7 +90,7 @@ export default function DynamicGalleryPage() {
         <meta name="twitter:image" content={ogImage} />
 
         {/* Canonical URL */}
-        {slug && <link rel="canonical" href={`https://hiyaboutique.in/gallery/${slug}`} />}
+        {slug && <link rel="canonical" href={`https://www.hiyafashions.com/gallery/${slug}`} />}
       </Head>
 
       <Navbar />
