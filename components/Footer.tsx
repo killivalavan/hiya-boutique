@@ -7,8 +7,9 @@ import { policyMap } from './policyDetails';
 export default function Footer() {
   const email = "hello@hiyafashions.com";
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const footerRef = useRef(null);
+  const footerRef = useRef<HTMLElement | null>(null);
   const [modalContent, setModalContent] = useState<null | string>(null);
+  const prevOverflow = useRef<string | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -23,6 +24,32 @@ export default function Footer() {
     };
   }, []);
 
+  useEffect(() => {
+    // disable scroll while policy modal is open
+    if (modalContent) {
+      if (prevOverflow.current === null) {
+        prevOverflow.current = document.body.style.overflow || '';
+      }
+      document.body.style.overflow = 'hidden';
+    } else {
+      if (prevOverflow.current !== null) {
+        document.body.style.overflow = prevOverflow.current;
+        prevOverflow.current = null;
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+    // cleanup on unmount in case modal was left open
+    return () => {
+      if (prevOverflow.current !== null) {
+        document.body.style.overflow = prevOverflow.current;
+        prevOverflow.current = null;
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }, [modalContent]);
+
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const policyLinks = [
@@ -35,7 +62,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer id="about" ref={footerRef} className="bg-black text-white px-6 pt-10 pb-4 text-sm relative">
+      <footer id="about" ref={(el) => (footerRef.current = el)} className="bg-black text-white px-6 pt-10 pb-4 text-sm relative">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 sm:justify-items-center">
 
           {/* Logo */}
@@ -117,36 +144,36 @@ export default function Footer() {
       </footer>
 
       {/* Modal */}
-     <AnimatePresence>
-      {modalContent && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4"
-          onClick={() => setModalContent(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 text-black relative"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {modalContent && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4"
+            onClick={() => setModalContent(null)}
           >
-            <h2 className="text-xl font-bold mb-4">{modalContent}</h2>
-            {modalContent && policyMap[modalContent] && (
-              <div className="text-sm leading-relaxed whitespace-pre-line">
-                {policyMap[modalContent]}
-              </div>
-            )}
-            <button
-              onClick={() => setModalContent(null)}
-              className="absolute top-2 right-3 text-gray-500 hover:text-black text-lg"
-              aria-label="Close"
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 text-black relative"
+              onClick={(e) => e.stopPropagation()}
             >
-              ×
-            </button>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  </>
+              <h2 className="text-xl font-bold mb-4">{modalContent}</h2>
+              {modalContent && policyMap[modalContent] && (
+                <div className="text-sm leading-relaxed whitespace-pre-line">
+                  {policyMap[modalContent]}
+                </div>
+              )}
+              <button
+                onClick={() => setModalContent(null)}
+                className="absolute top-2 right-3 text-gray-500 hover:text-black text-lg"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

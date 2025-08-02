@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaWhatsapp } from 'react-icons/fa';
 
 export default function PopupModal() {
   const [show, setShow] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+  const prevOverflow = useRef<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     fetch('/api/popup-flag')
       .then(res => res.json())
       .then(data => {
@@ -23,15 +23,42 @@ export default function PopupModal() {
           }
 
           // Schedule repeated popup every 2 minutes
-          interval = setInterval(() => {
+          intervalRef.current = setInterval(() => {
             setShow(true);
           }, 2 * 60 * 1000);
         }
       })
       .catch(err => console.error('Failed to fetch popup flag:', err));
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      // restore overflow if left disabled
+      if (prevOverflow.current !== null) {
+        document.body.style.overflow = prevOverflow.current;
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    };
   }, []);
+
+  // disable scroll when modal is visible
+  useEffect(() => {
+    if (isEnabled && show) {
+      // save previous overflow only once
+      if (prevOverflow.current === null) {
+        prevOverflow.current = document.body.style.overflow || '';
+      }
+      document.body.style.overflow = 'hidden';
+    } else {
+      // restore
+      if (prevOverflow.current !== null) {
+        document.body.style.overflow = prevOverflow.current;
+        prevOverflow.current = null;
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+  }, [isEnabled, show]);
 
   const closeModal = () => setShow(false);
 

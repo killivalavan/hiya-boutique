@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { FaEnvelope } from 'react-icons/fa'
 
 export default function About() {
   return (
@@ -104,9 +105,34 @@ export default function About() {
               story, and every design is made just for you.
             </p>
           </section>
+
+          {/* Contact Callout */}
+          <div className="mt-12 bg-gradient-to-r from-[#f3f9f4] to-white border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-lg font-semibold mb-1">Have a question or want to collaborate?</h3>
+              <p className="text-sm text-gray-700">
+                Reach out to us at{' '}
+                <a
+                  href="mailto:hello@hiyafashions.com"
+                  className="inline-flex items-center gap-1 font-medium text-[#8bc63e] hover:underline"
+                >
+                 hello@hiyafashions.com
+                </a>
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <a
+                href="mailto:hello@hiyafashions.com"
+                aria-label="Email Us"
+                className="inline-flex items-center justify-center gap-2 bg-[#8bc63e] hover:bg-[#7aa633] text-white px-5 py-3 rounded-md text-sm font-semibold transition"
+              >
+                <FaEnvelope aria-hidden="true" className="text-base" />
+                <span>Email Us</span>
+              </a>
+            </div>
+          </div>
         </article>
       </main>
-
       <Footer />
     </>
   )
