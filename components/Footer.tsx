@@ -1,64 +1,36 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { FaInstagram, FaFacebookF, FaYoutube, FaPhoneAlt, FaEnvelope, FaArrowUp, FaAngleRight } from 'react-icons/fa';
+import {
+  FaInstagram,
+  FaFacebookF,
+  FaYoutube,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaArrowUp,
+  FaAngleRight
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { policyMap } from './policyDetails';
+import { useLockBodyScroll } from '../lib/useLockBodyScroll';
 
 export default function Footer() {
   const email = "hello@hiyafashions.com";
   const [showScrollButton, setShowScrollButton] = useState(false);
   const footerRef = useRef<HTMLElement | null>(null);
   const [modalContent, setModalContent] = useState<null | string>(null);
-  const prevOverflow = useRef<string | null>(null);
 
-  // iOS scroll lock helper
-  const preventScroll = (e: TouchEvent) => e.preventDefault();
+  useLockBodyScroll(!!modalContent);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setShowScrollButton(entry.isIntersecting),
       { threshold: 0.1 }
     );
-
     if (footerRef.current) observer.observe(footerRef.current);
-
     return () => {
       if (footerRef.current) observer.unobserve(footerRef.current);
     };
   }, []);
-
-  useEffect(() => {
-    if (modalContent) {
-      // Save current overflow setting
-      if (prevOverflow.current === null) {
-        prevOverflow.current = document.body.style.overflow || '';
-      }
-      // Lock scroll (desktop)
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-
-      // Lock scroll (iOS)
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-    } else {
-      // Restore scroll
-      if (prevOverflow.current !== null) {
-        document.body.style.overflow = prevOverflow.current;
-        prevOverflow.current = null;
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-      document.body.style.position = '';
-      document.body.style.width = '';
-
-      // Remove iOS scroll lock
-      document.removeEventListener('touchmove', preventScroll);
-    }
-
-    return () => {
-      document.removeEventListener('touchmove', preventScroll);
-    };
-  }, [modalContent]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
