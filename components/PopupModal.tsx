@@ -1,17 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaWhatsapp } from 'react-icons/fa';
+import { useLockBodyScroll } from '../lib/useLockBodyScroll'; // adjust path if needed
 
 export default function PopupModal() {
   const [show, setShow] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
-  const prevOverflow = useRef<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Function to prevent background scroll (for iOS)
-  const preventScroll = (e: TouchEvent) => {
-    e.preventDefault();
-  };
+  // lock body when modal is open
+  useLockBodyScroll(isEnabled && show);
 
   useEffect(() => {
     fetch('/api/popup-flag')
@@ -19,15 +17,11 @@ export default function PopupModal() {
       .then(data => {
         if (data.enabled) {
           setIsEnabled(true);
-
-          // Show only if not shown before in this session
           const alreadyShown = sessionStorage.getItem('hiya-popup-shown');
           if (!alreadyShown) {
             setShow(true);
             sessionStorage.setItem('hiya-popup-shown', 'true');
           }
-
-          // Schedule repeated popup every 2 minutes
           intervalRef.current = setInterval(() => {
             setShow(true);
           }, 2 * 60 * 1000);
@@ -37,43 +31,8 @@ export default function PopupModal() {
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (prevOverflow.current !== null) {
-        document.body.style.overflow = prevOverflow.current;
-        document.body.style.position = '';
-        document.body.style.width = '';
-      } else {
-        document.body.style.overflow = 'auto';
-        document.body.style.position = '';
-        document.body.style.width = '';
-      }
-      document.removeEventListener('touchmove', preventScroll);
     };
   }, []);
-
-  // Disable scroll when modal is visible (desktop + iOS)
-  useEffect(() => {
-    if (isEnabled && show) {
-      if (prevOverflow.current === null) {
-        prevOverflow.current = document.body.style.overflow || '';
-      }
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-
-      // iOS fix
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-    } else {
-      if (prevOverflow.current !== null) {
-        document.body.style.overflow = prevOverflow.current;
-        prevOverflow.current = null;
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.removeEventListener('touchmove', preventScroll);
-    }
-  }, [isEnabled, show]);
 
   const closeModal = () => setShow(false);
 
@@ -108,16 +67,19 @@ export default function PopupModal() {
             </h2>
 
             <p className="text-sm sm:text-base text-gray-700 mb-2 leading-relaxed">
-              Book your <span className="font-semibold text-pink-600">Aari or Custom Stitching Blouses</span> / any outfit this Aadi month and get
-              <span className="font-bold text-green-600"> FLAT 50% OFF</span> on
+              Book your <span className="font-semibold text-pink-600">Aari or Custom Stitching Blouses</span> / any outfit this Aadi month and get{' '}
+              <span className="font-bold text-green-600"> FLAT 50% OFF</span> on{' '}
               <span className="font-semibold text-green-600"> Saree Pre-Pleating!</span> 💫
             </p>
 
             <p className="text-sm text-gray-600 mt-2">
-              💥 Pre-pleating starts at <span className="line-through">₹500</span> – now just <span className="font-bold text-pink-600">₹250</span> this month!
+              💥 Pre-pleating starts at <span className="line-through">₹500</span> – now just{' '}
+              <span className="font-bold text-pink-600">₹250</span> this month!
             </p>
 
-            <p className="mt-2 text-sm text-gray-700 italic">✨ Perfect pleats. Perfect look. Perfect price.</p>
+            <p className="mt-2 text-sm text-gray-700 italic">
+              ✨ Perfect pleats. Perfect look. Perfect price.
+            </p>
 
             <ul className="mt-3 text-xs sm:text-sm text-gray-500 list-disc list-inside">
               <li>Offer valid for bookings made during the Aadi month only</li>
