@@ -72,7 +72,6 @@ export default function GalleryPage({
 
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
-  const [isZoomed, setIsZoomed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   const handleImageLoad = (url: string) => {
@@ -86,14 +85,9 @@ export default function GalleryPage({
   const getThumbnailUrl = (url: string) =>
     url.includes('/upload/') ? url.replace('/upload/', '/upload/w_500,q_70/') : url;
 
-  const getModalUrl = (url: string, zoomed: boolean, mobile: boolean) => {
+  const getModalUrl = (url: string, mobile: boolean) => {
     if (!url.includes('/upload/')) return url;
-    let size: string;
-    if (mobile) {
-      size = zoomed ? 'w_900,q_80' : 'w_600,q_70';
-    } else {
-      size = zoomed ? 'w_1200,q_80' : 'w_900,q_70';
-    }
+    const size = mobile ? 'w_600,q_70' : 'w_900,q_70';
     return url.replace('/upload/', `/upload/${size}/`);
   };
 
@@ -184,18 +178,11 @@ export default function GalleryPage({
     [...preloadNext, ...preloadPrev].forEach((img) => preloadImage(img.url));
   }, [selectedImage, currentIndex, galleryImages]);
 
-  useEffect(() => {
-    if (selectedImage) {
-      setIsModalImageLoaded(false);
-    }
-  }, [isZoomed, selectedImage]);
-
   const showPrevImage = () => {
     if (currentIndex > 0) {
       const prevImg = galleryImages[currentIndex - 1];
       setSelectedImage(prevImg.url);
       setIsModalImageLoaded(false);
-      setIsZoomed(false);
     }
   };
 
@@ -204,7 +191,6 @@ export default function GalleryPage({
       const nextImg = galleryImages[currentIndex + 1];
       setSelectedImage(nextImg.url);
       setIsModalImageLoaded(false);
-      setIsZoomed(false);
     }
   };
 
@@ -219,10 +205,6 @@ export default function GalleryPage({
       if (deltaX > 50) showPrevImage();
       else if (deltaX < -50) showNextImage();
     }
-  };
-
-  const handleDoubleClick = () => {
-    setIsZoomed((prev) => !prev);
   };
 
   const loadMoreImages = () => {
@@ -279,7 +261,6 @@ export default function GalleryPage({
                         onClick={() => {
                           setSelectedImage(img.url);
                           setIsModalImageLoaded(false);
-                          setIsZoomed(false);
                         }}
                       />
                     </div>
@@ -325,7 +306,6 @@ export default function GalleryPage({
                   onClick={() => {
                     setSelectedImage(null);
                     setIsModalImageLoaded(false);
-                    setIsZoomed(false);
                   }}
                 >
                   &times;
@@ -351,27 +331,22 @@ export default function GalleryPage({
                       <div className="absolute top-0 left-0 w-full h-full bg-gray-300 animate-pulse rounded-lg z-10" />
                     )}
                     <FallbackImage
-                      key={`${selectedImage}-${isZoomed ? 'zoomed' : 'normal'}-${isMobile ? 'mobile' : 'desktop'}`}
+                      key={`${selectedImage}-${isMobile ? 'mobile' : 'desktop'}`}
                       src={
                         errorImages[selectedImage!]
                           ? fallbackImage
-                          : getModalUrl(selectedImage!, isZoomed, isMobile)
+                          : getModalUrl(selectedImage!, isMobile)
                       }
                       fallback={fallbackImage}
                       alt={`${title} modal image ${currentIndex + 1}`}
-                      width={
-                        isMobile ? (isZoomed ? 900 : 600) : isZoomed ? 1200 : 900
-                      }
-                      height={
-                        isMobile ? (isZoomed ? 600 : 400) : isZoomed ? 800 : 600
-                      }
+                      width={isMobile ? 600 : 900}
+                      height={isMobile ? 400 : 600}
                       sizes="(max-width: 768px) 90vw, 800px"
                       className={`w-full h-auto max-h-[75vh] object-contain rounded-lg z-20 ${
                         isModalImageLoaded ? 'opacity-100' : 'opacity-0'
                       } transition-opacity duration-300`}
                       onLoadingComplete={() => setIsModalImageLoaded(true)}
                       onError={() => handleImageError(selectedImage!)}
-                      onDoubleClick={handleDoubleClick}
                     />
                   </div>
 
