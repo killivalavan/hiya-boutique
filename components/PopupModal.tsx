@@ -8,6 +8,11 @@ export default function PopupModal() {
   const prevOverflow = useRef<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Function to prevent background scroll (for iOS)
+  const preventScroll = (e: TouchEvent) => {
+    e.preventDefault();
+  };
+
   useEffect(() => {
     fetch('/api/popup-flag')
       .then(res => res.json())
@@ -32,31 +37,41 @@ export default function PopupModal() {
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      // restore overflow if left disabled
       if (prevOverflow.current !== null) {
         document.body.style.overflow = prevOverflow.current;
+        document.body.style.position = '';
+        document.body.style.width = '';
       } else {
         document.body.style.overflow = 'auto';
+        document.body.style.position = '';
+        document.body.style.width = '';
       }
+      document.removeEventListener('touchmove', preventScroll);
     };
   }, []);
 
-  // disable scroll when modal is visible
+  // Disable scroll when modal is visible (desktop + iOS)
   useEffect(() => {
     if (isEnabled && show) {
-      // save previous overflow only once
       if (prevOverflow.current === null) {
         prevOverflow.current = document.body.style.overflow || '';
       }
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+
+      // iOS fix
+      document.addEventListener('touchmove', preventScroll, { passive: false });
     } else {
-      // restore
       if (prevOverflow.current !== null) {
         document.body.style.overflow = prevOverflow.current;
         prevOverflow.current = null;
       } else {
         document.body.style.overflow = 'auto';
       }
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.removeEventListener('touchmove', preventScroll);
     }
   }, [isEnabled, show]);
 

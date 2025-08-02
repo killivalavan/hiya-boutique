@@ -11,6 +11,9 @@ export default function Footer() {
   const [modalContent, setModalContent] = useState<null | string>(null);
   const prevOverflow = useRef<string | null>(null);
 
+  // iOS scroll lock helper
+  const preventScroll = (e: TouchEvent) => e.preventDefault();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setShowScrollButton(entry.isIntersecting),
@@ -25,27 +28,35 @@ export default function Footer() {
   }, []);
 
   useEffect(() => {
-    // disable scroll while policy modal is open
     if (modalContent) {
+      // Save current overflow setting
       if (prevOverflow.current === null) {
         prevOverflow.current = document.body.style.overflow || '';
       }
+      // Lock scroll (desktop)
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+
+      // Lock scroll (iOS)
+      document.addEventListener('touchmove', preventScroll, { passive: false });
     } else {
+      // Restore scroll
       if (prevOverflow.current !== null) {
         document.body.style.overflow = prevOverflow.current;
         prevOverflow.current = null;
       } else {
         document.body.style.overflow = 'auto';
       }
+      document.body.style.position = '';
+      document.body.style.width = '';
+
+      // Remove iOS scroll lock
+      document.removeEventListener('touchmove', preventScroll);
     }
+
     return () => {
-      if (prevOverflow.current !== null) {
-        document.body.style.overflow = prevOverflow.current;
-        prevOverflow.current = null;
-      } else {
-        document.body.style.overflow = 'auto';
-      }
+      document.removeEventListener('touchmove', preventScroll);
     };
   }, [modalContent]);
 
