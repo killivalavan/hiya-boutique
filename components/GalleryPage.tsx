@@ -5,12 +5,49 @@ import Footer from './Footer';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 
 // Types
-
 type CloudinaryFile = {
   url: string;
   public_id: string;
   badge?: string | null;
 };
+
+type FallbackImageProps = React.ComponentProps<typeof Image> & {
+  fallback?: string;
+  src: string;
+};
+
+function FallbackImage({
+  src,
+  fallback = '/image-not-found.png',
+  onError,
+  onLoadingComplete,
+  ...props
+}: FallbackImageProps) {
+  const [currentSrc, setCurrentSrc] = useState(src);
+  const erroredRef = useRef(false);
+
+  useEffect(() => {
+    setCurrentSrc(src);
+    erroredRef.current = false;
+  }, [src]);
+
+  return (
+    <Image
+      {...props}
+      src={currentSrc}
+      onError={(e) => {
+        if (!erroredRef.current) {
+          erroredRef.current = true;
+          setCurrentSrc(fallback);
+        }
+        if (onError) onError(e as any);
+      }}
+      onLoadingComplete={(res) => {
+        if (onLoadingComplete) onLoadingComplete(res);
+      }}
+    />
+  );
+}
 
 export default function GalleryPage({
   title,
@@ -35,8 +72,8 @@ export default function GalleryPage({
 
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
-  const lastTap = useRef<number>(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const handleImageLoad = (url: string) => {
     setLoadedImages((prev) => ({ ...prev, [url]: true }));
@@ -48,6 +85,17 @@ export default function GalleryPage({
 
   const getThumbnailUrl = (url: string) =>
     url.includes('/upload/') ? url.replace('/upload/', '/upload/w_500,q_70/') : url;
+
+  const getModalUrl = (url: string, zoomed: boolean, mobile: boolean) => {
+    if (!url.includes('/upload/')) return url;
+    let size: string;
+    if (mobile) {
+      size = zoomed ? 'w_900,q_80' : 'w_600,q_70';
+    } else {
+      size = zoomed ? 'w_1200,q_80' : 'w_900,q_70';
+    }
+    return url.replace('/upload/', `/upload/${size}/`);
+  };
 
   const getBadgeGradientClass = (badge: string) => {
     switch (badge) {
@@ -71,6 +119,13 @@ export default function GalleryPage({
       preloaded.current.add(url);
     }
   };
+
+  useEffect(() => {
+    const updateIsMobile = () => setIsMobile(window.innerWidth <= 768);
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+    return () => window.removeEventListener('resize', updateIsMobile);
+  }, []);
 
   useEffect(() => {
     const storageKey = `gallery_${title}`;
@@ -129,6 +184,12 @@ export default function GalleryPage({
     [...preloadNext, ...preloadPrev].forEach((img) => preloadImage(img.url));
   }, [selectedImage, currentIndex, galleryImages]);
 
+  useEffect(() => {
+    if (selectedImage) {
+      setIsModalImageLoaded(false);
+    }
+  }, [isZoomed, selectedImage]);
+
   const showPrevImage = () => {
     if (currentIndex > 0) {
       const prevImg = galleryImages[currentIndex - 1];
@@ -173,7 +234,7 @@ export default function GalleryPage({
   const imagesToShow = galleryImages.slice(0, page * imagesPerPage);
 
   return (
-   <>
+    <>
       <div className="min-h-screen bg-gradient-to-b p-8">
         <h1 className="text-xl sm:text-2xl font-bold text-start text-gray-800 mb-8">{title}</h1>
 
@@ -182,16 +243,20 @@ export default function GalleryPage({
             ? Array.from({ length: imagesPerPage }).map((_, index) => (
                 <div key={index} className="relative w-full pt-[133.33%] bg-gray-300 animate-pulse rounded-lg" />
               ))
-            : imagesToShow.map((img) => {
+            : imagesToShow.map((img, idx) => {
                 const displayUrl = errorImages[img.url] ? fallbackImage : getThumbnailUrl(img.url);
                 return (
                   <div
                     key={img.public_id}
-                    className={`relative cursor-pointer group w-full ${recentlyAdded.has(img.url) ? 'ring-[3px] ring-[#FFD700] animate-pulse' : ''}`}
+                    className={`relative cursor-pointer group w-full ${
+                      recentlyAdded.has(img.url) ? 'ring-[3px] ring-[#FFD700] animate-pulse' : ''
+                    }`}
                   >
                     {img.badge && (
                       <span
-                        className={`absolute top-2 left-2 z-20 px-2 py-[2px] text-[10px] font-semibold text-white rounded-full shadow bg-gradient-to-r ${getBadgeGradientClass(img.badge)}`}
+                        className={`absolute top-2 left-2 z-20 px-2 py-[2px] text-[10px] font-semibold text-white rounded-full shadow bg-gradient-to-r ${getBadgeGradientClass(
+                          img.badge
+                        )}`}
                       >
                         {img.badge}
                       </span>
@@ -203,15 +268,18 @@ export default function GalleryPage({
                       )}
                       <Image
                         src={displayUrl}
-                        alt=""
+                        alt={`${title} thumbnail ${idx + 1}`}
                         fill
-                        className={`object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 ${loadedImages[img.url] ? 'opacity-100' : 'opacity-0'} ${slug === 'whatsapp-testimonials' ? 'object-cover' : ''}`}
+                        className={`object-cover rounded-lg shadow-lg group-hover:opacity-80 transition-opacity duration-300 ${
+                          loadedImages[img.url] ? 'opacity-100' : 'opacity-0'
+                        } ${slug === 'whatsapp-testimonials' ? 'object-cover' : ''}`}
                         loading="lazy"
                         onLoadingComplete={() => handleImageLoad(img.url)}
                         onError={() => handleImageError(img.url)}
                         onClick={() => {
                           setSelectedImage(img.url);
                           setIsModalImageLoaded(false);
+                          setIsZoomed(false);
                         }}
                       />
                     </div>
@@ -257,6 +325,7 @@ export default function GalleryPage({
                   onClick={() => {
                     setSelectedImage(null);
                     setIsModalImageLoaded(false);
+                    setIsZoomed(false);
                   }}
                 >
                   &times;
@@ -281,16 +350,28 @@ export default function GalleryPage({
                     {!isModalImageLoaded && (
                       <div className="absolute top-0 left-0 w-full h-full bg-gray-300 animate-pulse rounded-lg z-10" />
                     )}
-                    <Image
-                      src={errorImages[selectedImage] ? fallbackImage : selectedImage}
-                      alt="Zoomable"
-                      width={1200}
-                      height={800}
+                    <FallbackImage
+                      key={`${selectedImage}-${isZoomed ? 'zoomed' : 'normal'}-${isMobile ? 'mobile' : 'desktop'}`}
+                      src={
+                        errorImages[selectedImage!]
+                          ? fallbackImage
+                          : getModalUrl(selectedImage!, isZoomed, isMobile)
+                      }
+                      fallback={fallbackImage}
+                      alt={`${title} modal image ${currentIndex + 1}`}
+                      width={
+                        isMobile ? (isZoomed ? 900 : 600) : isZoomed ? 1200 : 900
+                      }
+                      height={
+                        isMobile ? (isZoomed ? 600 : 400) : isZoomed ? 800 : 600
+                      }
+                      sizes="(max-width: 768px) 90vw, 800px"
                       className={`w-full h-auto max-h-[75vh] object-contain rounded-lg z-20 ${
                         isModalImageLoaded ? 'opacity-100' : 'opacity-0'
                       } transition-opacity duration-300`}
                       onLoadingComplete={() => setIsModalImageLoaded(true)}
                       onError={() => handleImageError(selectedImage!)}
+                      onDoubleClick={handleDoubleClick}
                     />
                   </div>
 
