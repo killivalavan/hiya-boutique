@@ -39,7 +39,6 @@ export default function Footer() {
         document.body.style.overflow = 'auto';
       }
     }
-    // cleanup on unmount in case modal was left open
     return () => {
       if (prevOverflow.current !== null) {
         document.body.style.overflow = prevOverflow.current;
@@ -62,7 +61,13 @@ export default function Footer() {
 
   return (
     <>
-      <footer id="about" ref={(el) => (footerRef.current = el)} className="bg-black text-white px-6 pt-10 pb-4 text-sm relative">
+      <footer
+        id="about"
+        ref={(el) => {
+          footerRef.current = el;
+        }}
+        className="bg-black text-white px-6 pt-10 pb-4 text-sm relative"
+      >
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 sm:justify-items-center">
 
           {/* Logo */}
@@ -72,22 +77,26 @@ export default function Footer() {
 
           {/* Address */}
           <div>
-            <h4 className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit"
-              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}>
+            <h4
+              className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit"
+              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}
+            >
               Address
             </h4>
             <p className="text-white text-sm leading-relaxed">
-              Hiya Fashions & Boutique<br/>
-              No. 21, RKV Avenue Main Road,<br/>
-              Zamin Pallavaram,<br/>
+              Hiya Fashions & Boutique<br />
+              No. 21, RKV Avenue Main Road,<br />
+              Zamin Pallavaram,<br />
               Chennai - 600117.
             </p>
           </div>
 
           {/* Contact */}
           <div className="flex flex-col md:items-start text-center md:text-left">
-            <h4 className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit mr-auto"
-              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}>
+            <h4
+              className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit mr-auto"
+              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}
+            >
               Contact Us
             </h4>
             <p className="flex items-center gap-2 text-white">
@@ -96,22 +105,34 @@ export default function Footer() {
             <p className="flex items-center gap-2 text-white">
               <FaPhoneAlt /> +91 86102 03368
             </p>
-            <h4 className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit mt-5"
-              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}>
+            <h4
+              className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit mt-5"
+              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}
+            >
               Follow Us
             </h4>
             <div className="flex gap-4 mt-2 text-white text-lg">
-              <a href="https://www.instagram.com/hiya_instore/" aria-label="Instagram"><FaInstagram /></a>
-              <a href="https://www.facebook.com/ilakkiya2017" aria-label="Facebook"><FaFacebookF /></a>
-              <a href="https://www.youtube.com/@hiyafashionsandboutique" aria-label="YouTube"><FaYoutube /></a>
-              <a href={`mailto:${email}`} aria-label="Gmail"><FaEnvelope /></a>
+              <a href="https://www.instagram.com/hiya_instore/" aria-label="Instagram">
+                <FaInstagram />
+              </a>
+              <a href="https://www.facebook.com/ilakkiya2017" aria-label="Facebook">
+                <FaFacebookF />
+              </a>
+              <a href="https://www.youtube.com/@hiyafashionsandboutique" aria-label="YouTube">
+                <FaYoutube />
+              </a>
+              <a href={`mailto:${email}`} aria-label="Gmail">
+                <FaEnvelope />
+              </a>
             </div>
           </div>
 
           {/* Policies */}
           <div className="flex flex-col items-start text-left">
-            <h4 className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit mr-auto"
-              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}>
+            <h4
+              className="text-lg font-bold mb-2 bg-clip-text text-transparent w-fit mr-auto"
+              style={{ backgroundImage: 'linear-gradient(to right, #688245, #8CC63E)' }}
+            >
               Our Policies
             </h4>
             <div className="flex flex-col gap-1">
