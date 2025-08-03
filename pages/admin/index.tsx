@@ -1,3 +1,4 @@
+// pages/admin/index.tsx
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../../components/Navbar';
@@ -36,8 +37,11 @@ export default function AdminPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [existingFiles, setExistingFiles] = useState<CloudinaryFile[]>([]);
-  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [popupEnabled, setPopupEnabled] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadPhase, setUploadPhase] = useState<'idle' | 'uploading' | 'processing'>('idle');
 
   useEffect(() => {
     const auth = localStorage.getItem('admin-auth');
@@ -48,7 +52,8 @@ export default function AdminPage() {
   useEffect(() => {
     fetch('/api/popup-flag')
       .then(res => res.json())
-      .then(data => setPopupEnabled(data.enabled));
+      .then(data => setPopupEnabled(data.enabled))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -69,14 +74,18 @@ export default function AdminPage() {
 
   const togglePopup = async () => {
     const newValue = !popupEnabled;
-    const res = await fetch('/api/popup-flag', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ enabled: newValue })
-    });
-    if (res.ok) {
-      setPopupEnabled(newValue);
-      showToast(`Popup ${newValue ? 'enabled' : 'disabled'}`, 'success');
+    try {
+      const res = await fetch('/api/popup-flag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: newValue })
+      });
+      if (res.ok) {
+        setPopupEnabled(newValue);
+        showToast(`Popup ${newValue ? 'enabled' : 'disabled'}`, 'success');
+      }
+    } catch (e) {
+      showToast('Failed to toggle popup', 'error');
     }
   };
 
@@ -85,8 +94,8 @@ export default function AdminPage() {
       showToast('Please select category and images', 'error');
       return;
     }
-    if (files.length > 5) {
-      showToast('You can upload a maximum of 5 images at a time', 'error');
+    if (files.length > 10) {
+      showToast('You can upload a maximum of 10 images at a time', 'error');
       return;
     }
 
@@ -94,29 +103,68 @@ export default function AdminPage() {
     formData.append('category', selectedCategory);
     Array.from(files).forEach(file => formData.append('images', file));
 
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
+    setIsUploading(true);
+    setUploadPhase('uploading');
+    setUploadProgress(null);
 
-      const data = await res.json();
-      if (res.ok) {
-        showToast('Upload successful!', 'success');
-        setFiles(null);
-        (document.getElementById('images') as HTMLInputElement).value = '';
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload');
 
-        // 👇 Append new files to the top of the list
-        if (data?.files?.length) {
-          setExistingFiles(prev => [...data.files, ...prev]);
-        }
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setUploadProgress(percent);
       } else {
-        showToast('Upload failed: ' + (data?.error || 'Unknown error'), 'error');
+        setUploadProgress(null);
       }
-    } catch (err: any) {
-      console.error('Upload error:', err);
-      showToast('Upload failed: ' + err.message, 'error');
-    }
+    };
+
+    xhr.upload.onloadend = () => {
+      // Finished sending, move to processing
+      setUploadPhase('processing');
+      setUploadProgress(null);
+    };
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        setIsUploading(false);
+        setUploadPhase('idle');
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            if (data?.files?.length) {
+              showToast('Upload successful!', 'success');
+              setExistingFiles(prev => [...data.files, ...prev]);
+              setFiles(null);
+              const input = document.getElementById('images') as HTMLInputElement;
+              if (input) input.value = '';
+            } else {
+              showToast('Upload succeeded but no file info returned', 'error');
+            }
+          } catch (e) {
+            console.error('Parsing upload response failed', e);
+            showToast('Upload succeeded but response parsing failed', 'error');
+          }
+        } else {
+          let errMsg = 'Unknown error';
+          try {
+            const err = JSON.parse(xhr.responseText);
+            errMsg = err.error || JSON.stringify(err);
+          } catch {
+            errMsg = xhr.responseText || xhr.statusText;
+          }
+          showToast('Upload failed: ' + errMsg, 'error');
+        }
+      }
+    };
+
+    xhr.onerror = () => {
+      setIsUploading(false);
+      setUploadPhase('idle');
+      showToast('Upload failed: network error', 'error');
+    };
+
+    xhr.send(formData);
   };
 
   const handleDelete = async (file: CloudinaryFile) => {
@@ -151,26 +199,30 @@ export default function AdminPage() {
       return;
     }
 
-    const res = await fetch(`${window.location.origin}/api/set-badge`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        public_id: file.public_id,
-        badge: badgeValue,
-        category: selectedCategory
-      })
-    });
+    try {
+      const res = await fetch(`${window.location.origin}/api/set-badge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          public_id: file.public_id,
+          badge: badgeValue,
+          category: selectedCategory
+        })
+      });
 
-    const result = await res.json();
-    if (res.ok) {
-      showToast('Badge updated!', 'success');
-      setExistingFiles(prev =>
-        prev.map(f =>
-          f.public_id === file.public_id ? { ...f, badge: badgeValue } : f
-        )
-      );
-    } else {
-      console.error('Badge update failed:', result.error);
+      const result = await res.json();
+      if (res.ok) {
+        showToast('Badge updated!', 'success');
+        setExistingFiles(prev =>
+          prev.map(f =>
+            f.public_id === file.public_id ? { ...f, badge: badgeValue } : f
+          )
+        );
+      } else {
+        console.error('Badge update failed:', result.error);
+        showToast('Failed to update badge', 'error');
+      }
+    } catch (e) {
       showToast('Failed to update badge', 'error');
     }
   };
@@ -200,7 +252,7 @@ export default function AdminPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
         <meta name="robots" content="noindex, nofollow" />
-        
+
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -216,17 +268,19 @@ export default function AdminPage() {
           <button
             onClick={handleLogout}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            disabled={isUploading}
           >
             Logout
           </button>
         </div>
 
-        <div className="bg-white p-6 rounded shadow-md max-w-xl mx-auto">
+        <div className="bg-white p-6 rounded shadow-md max-w-xl mx-auto relative">
           <div className="mb-6 flex items-center justify-between">
             <span className="font-semibold text-gray-800">Popup Modal:</span>
             <button
               onClick={togglePopup}
               className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 ${popupEnabled ? 'bg-green-500' : 'bg-gray-400'}`}
+              disabled={isUploading}
             >
               <span
                 className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${popupEnabled ? 'translate-x-6' : 'translate-x-1'}`}
@@ -240,6 +294,7 @@ export default function AdminPage() {
             className="w-full mb-4 p-2 border rounded"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
+            disabled={isUploading}
           >
             <option value="">-- Select --</option>
             <optgroup label="Services">
@@ -254,7 +309,7 @@ export default function AdminPage() {
             </optgroup>
           </select>
 
-          <label htmlFor="images" className="block mb-2 font-semibold">Choose Images (max 5)</label>
+          <label htmlFor="images" className="block mb-2 font-semibold">Choose Images (max 10)</label>
           <input
             id="images"
             type="file"
@@ -262,14 +317,46 @@ export default function AdminPage() {
             accept="image/*"
             className="mb-4 w-full"
             onChange={(e) => setFiles(e.target.files)}
+            disabled={isUploading}
           />
 
-          <button
-            onClick={handleUpload}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-          >
-            Upload
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleUpload}
+              className="relative flex items-center bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <div className="mr-2 flex items-center">
+                    <div className="w-4 h-4 border-2 border-t-white border-r-white rounded-full animate-spin" />
+                  </div>
+                  {uploadPhase === 'uploading' ? (
+                    uploadProgress !== null ? (
+                      <span>Uploading ({uploadProgress}%)</span>
+                    ) : (
+                      <span>Uploading...</span>
+                    )
+                  ) : (
+                    <span>Processing...</span>
+                  )}
+                </>
+              ) : (
+                'Upload'
+              )}
+            </button>
+
+            {uploadPhase === 'uploading' && uploadProgress !== null && (
+              <div className="flex-1">
+                <div className="w-full bg-gray-200 rounded h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-blue-600 transition-width"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
 
           {selectedCategory && (
             <div className="mt-6">
@@ -288,6 +375,7 @@ export default function AdminPage() {
                     <button
                       onClick={() => handleDelete(file)}
                       className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                      disabled={isUploading}
                     >
                       &times;
                     </button>
@@ -296,6 +384,7 @@ export default function AdminPage() {
                       className="absolute bottom-1 left-1 text-xs px-1 py-[2px] bg-white bg-opacity-90 border rounded"
                       value={file.badge || ''}
                       onChange={(e) => handleBadgeChange(file, e.target.value)}
+                      disabled={isUploading}
                     >
                       <option value="">No Badge</option>
                       <option value="Best Seller">Best Seller</option>
@@ -312,8 +401,10 @@ export default function AdminPage() {
       </div>
 
       {toast && (
-        <div className={`fixed top-5 right-5 px-6 py-3 rounded shadow-lg z-50 transition-all duration-300
-          ${toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+        <div
+          className={`fixed top-5 right-5 px-6 py-3 rounded shadow-lg z-50 transition-all duration-300
+          ${toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}
+        >
           {toast.message}
         </div>
       )}
