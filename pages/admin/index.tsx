@@ -31,6 +31,58 @@ type CloudinaryFile = {
   badge?: string | null;
 };
 
+// compress a File image to under ~1MB by resizing and lowering quality iteratively
+async function compressImageTo1MB(file: File): Promise<Blob> {
+  const maxSizeBytes = 1 * 1024 * 1024; // 1MB
+  const imgBitmap = await createImageBitmap(file);
+  let canvas = document.createElement('canvas');
+  let ctx = canvas.getContext('2d')!;
+  let [width, height] = [imgBitmap.width, imgBitmap.height];
+
+  // draw initial image
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(imgBitmap, 0, 0, width, height);
+
+  let quality = 0.9;
+  let blob: Blob | null = await new Promise(resolve =>
+    canvas.toBlob(b => resolve(b!), 'image/jpeg', quality)
+  ) as Blob;
+
+  if (blob.size <= maxSizeBytes) return blob;
+
+  // reduce quality
+  while (quality > 0.3 && blob.size > maxSizeBytes) {
+    quality -= 0.1;
+    blob = await new Promise(resolve =>
+      canvas.toBlob(b => resolve(b!), 'image/jpeg', quality)
+    ) as Blob;
+  }
+
+  // if still too big, downscale progressively
+  while (blob.size > maxSizeBytes && (width > 400 || height > 400)) {
+    width = Math.round(width * 0.9);
+    height = Math.round(height * 0.9);
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(imgBitmap, 0, 0, width, height);
+
+    let localQuality = 0.8;
+    blob = await new Promise(resolve =>
+      canvas.toBlob(b => resolve(b!), 'image/jpeg', localQuality)
+    ) as Blob;
+
+    while (localQuality > 0.3 && blob.size > maxSizeBytes) {
+      localQuality -= 0.1;
+      blob = await new Promise(resolve =>
+        canvas.toBlob(b => resolve(b!), 'image/jpeg', localQuality)
+      ) as Blob;
+    }
+  }
+
+  return blob;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
@@ -99,72 +151,84 @@ export default function AdminPage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('category', selectedCategory);
-    Array.from(files).forEach(file => formData.append('images', file));
-
     setIsUploading(true);
     setUploadPhase('uploading');
     setUploadProgress(null);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/upload');
+    try {
+      const formData = new FormData();
+      formData.append('category', selectedCategory);
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        setUploadProgress(percent);
-      } else {
-        setUploadProgress(null);
+      // compress each file to ~1MB before appending
+      for (const file of Array.from(files)) {
+        const compressedBlob = await compressImageTo1MB(file);
+        const compressedFile = new File([compressedBlob], file.name, { type: 'image/jpeg' });
+        formData.append('images', compressedFile);
       }
-    };
 
-    xhr.upload.onloadend = () => {
-      // Finished sending, move to processing
-      setUploadPhase('processing');
-      setUploadProgress(null);
-    };
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload');
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress(percent);
+        } else {
+          setUploadProgress(null);
+        }
+      };
+
+      xhr.upload.onloadend = () => {
+        setUploadPhase('processing');
+        setUploadProgress(null);
+      };
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          setIsUploading(false);
+          setUploadPhase('idle');
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              if (data?.files?.length) {
+                showToast('Upload successful!', 'success');
+                setExistingFiles(prev => [...data.files, ...prev]);
+                setFiles(null);
+                const input = document.getElementById('images') as HTMLInputElement;
+                if (input) input.value = '';
+              } else {
+                showToast('Upload succeeded but no file info returned', 'error');
+              }
+            } catch (e) {
+              console.error('Parsing upload response failed', e);
+              showToast('Upload succeeded but response parsing failed', 'error');
+            }
+          } else {
+            let errMsg = 'Unknown error';
+            try {
+              const err = JSON.parse(xhr.responseText);
+              errMsg = err.error || JSON.stringify(err);
+            } catch {
+              errMsg = xhr.responseText || xhr.statusText;
+            }
+            showToast('Upload failed: ' + errMsg, 'error');
+          }
+        }
+      };
+
+      xhr.onerror = () => {
         setIsUploading(false);
         setUploadPhase('idle');
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const data = JSON.parse(xhr.responseText);
-            if (data?.files?.length) {
-              showToast('Upload successful!', 'success');
-              setExistingFiles(prev => [...data.files, ...prev]);
-              setFiles(null);
-              const input = document.getElementById('images') as HTMLInputElement;
-              if (input) input.value = '';
-            } else {
-              showToast('Upload succeeded but no file info returned', 'error');
-            }
-          } catch (e) {
-            console.error('Parsing upload response failed', e);
-            showToast('Upload succeeded but response parsing failed', 'error');
-          }
-        } else {
-          let errMsg = 'Unknown error';
-          try {
-            const err = JSON.parse(xhr.responseText);
-            errMsg = err.error || JSON.stringify(err);
-          } catch {
-            errMsg = xhr.responseText || xhr.statusText;
-          }
-          showToast('Upload failed: ' + errMsg, 'error');
-        }
-      }
-    };
+        showToast('Upload failed: network error', 'error');
+      };
 
-    xhr.onerror = () => {
+      xhr.send(formData);
+    } catch (err: any) {
+      console.error('Compression/upload error:', err);
+      showToast('Upload failed: ' + (err.message || 'unknown'), 'error');
       setIsUploading(false);
       setUploadPhase('idle');
-      showToast('Upload failed: network error', 'error');
-    };
-
-    xhr.send(formData);
+    }
   };
 
   const handleDelete = async (file: CloudinaryFile) => {
