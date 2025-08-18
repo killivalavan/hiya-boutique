@@ -87,7 +87,7 @@ export default function Home() {
     "@type": "Organization",
     "name": "Hiya Fashions & Boutique",
     "url": siteUrl,
-    "logo": `${siteUrl}/logo.png`,
+    "logo": `${siteUrl}/logo1.png`,
     "contactPoint": [
       {
         "@type": "ContactPoint",

@@ -9,7 +9,7 @@ export default class MyDocument extends Document {
           <link rel="manifest" href="/manifest.json" />
 
           {/* Optional: Favicon & Theme */}
-          <link rel="apple-touch-icon" href="/logo.png" sizes="180x180" />
+          <link rel="apple-touch-icon" href="/logo1.png" sizes="180x180" />
           <link rel="icon" href="/favicon.ico" />
           <meta name="theme-color" content="#ffffff" />
         </Head>

@@ -62,39 +62,42 @@ export default function PopupModal() {
               ×
             </button>
 
-            <h2 className="text-center text-lg sm:text-xl font-bold mb-4 text-yellow-500">
-              🎉 Aadi Special Offer at Hiya Fashions & Boutique! 🎉
-            </h2>
+          <h2 className="text-center text-lg sm:text-xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+            ✨ Hiya Star Client Offer ✨
+          </h2>
 
-            <p className="text-sm sm:text-base text-gray-700 mb-2 leading-relaxed">
-              Book your <span className="font-semibold text-pink-600">Aari or Custom Stitching Blouses</span> / any outfit this Aadi month and get{' '}
-              <span className="font-bold text-green-600"> FLAT 50% OFF</span> on{' '}
-              <span className="font-semibold text-green-600"> Saree Pre-Pleating!</span> 💫
-            </p>
+          <p className="text-sm sm:text-base text-gray-700 mb-2 leading-relaxed">
+            Share your picture in a <span className="font-semibold text-pink-600">Hiya outfit</span> + post a review on social media{' '}
+            <span className="font-semibold text-green-600">tagging us ⭐</span>
+          </p>
 
-            <p className="text-sm text-gray-600 mt-2">
-              💥 Pre-pleating starts at <span className="line-through">₹500</span> – now just{' '}
-              <span className="font-bold text-pink-600">₹250</span> this month!
-            </p>
+          <p className="text-sm text-gray-600 mt-2">
+            ✅ Get <span className="font-bold text-green-600">featured</span> on Hiya’s official website
+          </p>
 
-            <p className="mt-2 text-sm text-gray-700 italic">
-              ✨ Perfect pleats. Perfect look. Perfect price.
-            </p>
+          <p className="text-sm text-gray-600 mt-1">
+            ✅ Enjoy <span className="font-bold text-pink-600">FLAT 10% OFF</span> on your next customization order
+          </p>
 
-            <ul className="mt-3 text-xs sm:text-sm text-gray-500 list-disc list-inside">
-              <li>Offer valid for bookings made during the Aadi month only</li>
-              <li>Terms & Conditions apply</li>
-            </ul>
+          <p className="mt-2 text-sm text-gray-700 italic">
+            💫 Show off your style. Get rewarded.
+          </p>
 
-            <a
-              href="https://wa.me/917299927172?text=Hi, I want to book my Aadi Special Offer at Hiya Boutique!"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 mt-5 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full transition text-sm font-medium w-full"
-            >
-              <FaWhatsapp className="text-xl" />
-              Book Now
-            </a>
+          <ul className="mt-3 text-xs sm:text-sm text-gray-500 list-disc list-inside">
+            <li>Offer valid only for genuine posts with Hiya outfits</li>
+            <li>Terms & Conditions apply</li>
+          </ul>
+
+          <a
+            href="https://wa.me/917299927172?text=Hi, I want to avail the Hiya Star Client Offer!"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 mt-5 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full transition text-sm font-medium w-full"
+          >
+            <FaWhatsapp className="text-xl" />
+            Share & Claim
+          </a>
+
           </motion.div>
         </motion.div>
       )}
