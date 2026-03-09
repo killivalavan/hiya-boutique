@@ -13,13 +13,6 @@ const GalleryPage = dynamic(() => import('../../components/GalleryPage'), {
 
 const categoryTitles: Record<string, string> = {
   'silk-sarees': 'Silk Sarees',
-  'casual-party-wear-sarees': 'Casual & Party Wear Sarees',
-  'salwar-suits-unstitched': 'Salwar suits Unstitched',
-  'kurtis-kurti-sets': 'Kurtis / Kurti Sets',
-  'bottom-wears': 'Bottom Wears',
-  'accessories': 'Accessories',
-  'maxi-frocks': 'Maxi & Frocks',
-  'home-decors': 'Home Decors',
   'artificial-jewellery': 'Artificial Jewellery',
   'aari-embroidery-designing-customisation': 'Aari Embroidery Designing - Customisation',
   'customization-custom-tailoring': 'Customization - Custom Tailoring',

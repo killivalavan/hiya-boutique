@@ -14,18 +14,6 @@ const slides = [
     button: null,
   },
   {
-    src: "/carousel/c2.webp",
-    blurDataURL: "/carousel/c2-blur.webp",
-    alt: "kurtis and kurti sets",
-    text: <>
-      <span className="text-pink-500">Elegance</span> in Every Thread. <span className="text-pink-500">Passion</span> in Every Stitch.
-    </>,
-    button: {
-      label: "Explore kurtis",
-      href: "/gallery/kurtis-kurti-sets",
-    },
-  },
-  {
     src: "/carousel/c3.webp",
     blurDataURL: "/carousel/c3-blur.webp",
     alt: "Mehendi Art",
@@ -35,18 +23,6 @@ const slides = [
     button: {
       label: "Explore Mehendi Art",
       href: "/gallery/mehendi-art",
-    },
-  },
-  {
-    src: "/carousel/c4.webp",
-    blurDataURL: "/carousel/c4-blur.webp",
-    alt: "Casual and party sarees",
-    text: <>
-      Every pleat whispers <span className="text-pink-500">tradition</span>, every drape radiates <span className="text-pink-500">grace</span>.
-    </>,
-    button: {
-      label: "Explore Sarees",
-      href: "/gallery/casual-party-wear-sarees",
     },
   },
 ];

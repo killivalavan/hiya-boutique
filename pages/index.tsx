@@ -63,13 +63,6 @@ export default function Home() {
       'bridal-makeup-hair-style',
       'training',
       'silk-sarees',
-      'casual-party-wear-sarees',
-      'salwar-suits-unstitched',
-      'kurtis-kurti-sets',
-      'bottom-wears',
-      'accessories',
-      'maxi-frocks',
-      'home-decors',
       'artificial-jewellery',
       'clients-gallery',
       'whatsapp-testimonials'

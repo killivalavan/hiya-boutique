@@ -15,13 +15,6 @@ const services = [
 
 const collections = [
   'silk-sarees',
-  'casual-party-wear-sarees',
-  'salwar-suits-unstitched',
-  'kurtis-kurti-sets',
-  'bottom-wears',
-  'accessories',
-  'maxi-frocks',
-  'home-decors',
   'artificial-jewellery'
 ];
 
@@ -364,7 +357,7 @@ export default function AdminPage() {
             <optgroup label="Services">
               {services.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </optgroup>
-            <optgroup label="New Collections">
+            <optgroup label="Collections">
               {collections.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </optgroup>
             <optgroup label="Client Gallery">
